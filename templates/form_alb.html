@@ -36,22 +36,31 @@
       font-size: 1rem;
     }
   </style>
+
+  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
+    const LIFF_ID = "{{ liff_id | safe }}";
+
     async function initializeLIFF() {
       try {
-        await liff.init({ liffId: "YOUR_LIFF_ID" });
+        await liff.init({ liffId: LIFF_ID });
+
+        // 未ログインならログインページにリダイレクト
         if (!liff.isLoggedIn()) {
           liff.login();
-        } else {
-          const profile = await liff.getProfile();
-          console.log("✅ LINE Profile:", profile);
-          document.getElementById("user_id").value = profile.userId;
+          return; // ←ここで中断しないとエラーになる
         }
+
+        const profile = await liff.getProfile();
+        document.getElementById("user_id").value = profile.userId;
+
       } catch (error) {
         console.error("LIFF initialization failed:", error);
+        alert("LINEログインが必要です。ブラウザの拡張機能を無効にして再読み込みしてください。");
       }
     }
+
     window.onload = initializeLIFF;
   </script>
 </head>

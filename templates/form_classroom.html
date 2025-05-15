@@ -36,22 +36,30 @@
       font-size: 1rem;
     }
   </style>
+
+  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
+    const LIFF_ID = "{{ liff_id | safe }}";
+
     async function initializeLIFF() {
       try {
-        await liff.init({ liffId: "YOUR_LIFF_ID" });
+        await liff.init({ liffId: LIFF_ID });
+
         if (!liff.isLoggedIn()) {
           liff.login();
-        } else {
-          const profile = await liff.getProfile();
-          console.log("✅ LINE Profile:", profile);
-          document.getElementById("user_id").value = profile.userId;
+          return;
         }
+
+        const profile = await liff.getProfile();
+        document.getElementById("user_id").value = profile.userId;
+
       } catch (error) {
         console.error("LIFF initialization failed:", error);
+        alert("LINEログインに失敗しました。拡張機能を無効にして再度お試しください。");
       }
     }
+
     window.onload = initializeLIFF;
   </script>
 </head>
@@ -78,8 +86,8 @@
     </select>
 
     {% for field in settings.custom_fields %}
-      <label>{{ field.label }}</label>
-      <input type="text" name="{{ field.name }}">
+      <label for="{{ field.name }}">{{ field.label }}</label>
+      <input type="text" name="{{ field.name }}" id="{{ field.name }}">
     {% endfor %}
 
     <button type="submit"

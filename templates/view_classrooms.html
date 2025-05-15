@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>recruit</title>
+  <title>{{ settings.classroom_title | default("教室登録一覧") }}</title>
   <style>
     body { font-family: sans-serif; padding: 2rem; background: #f9f9f9; }
     table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -11,37 +11,62 @@
     h1 { text-align: center; margin-bottom: 1.5rem; }
   </style>
 
-  
+  <!-- LINE LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script>
+    const LIFF_ID = "{{ liff_id | safe }}";
+
+    async function initializeLIFF() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+
+        const profile = await liff.getProfile();
+        document.querySelectorAll('input[name="user_id"]').forEach(el => {
+          el.value = profile.userId;
+        });
+
+      } catch (error) {
+        console.error("LIFF initialization failed:", error);
+        alert("LINEログインに失敗しました。拡張機能や環境を見直してください。");
+      }
+    }
+
+    window.onload = initializeLIFF;
+  </script>
 </head>
 <body>
   <h1>{{ settings.classroom_title | default("教室登録一覧") }}</h1>
 
   <table>
     <thead>
-  <tr>
-    {% for header in headers[:-1] %}  <!-- user_idは非表示 -->
-      <th>{{ header }}</th>
-    {% endfor %}
-    <th>アクション</th>
-  </tr>
-</thead>
-<tbody>
-  {% for row_index, row in rows %}
-  <tr>
-    {% for cell in row %}
-      <td>{{ cell }}</td>
-    {% endfor %}
-    <td>
-      <form action="/interest" method="POST">
-        <input type="hidden" name="row_index" value="{{ row_index }}">
-        <button type="submit">興味あり</button>
-      </form>
-    </td>
-  </tr>
-{% endfor %}
-
-</tbody>
-
-
-
+      <tr>
+        {% for header in headers[:-1] %}
+          <th>{{ header }}</th>
+        {% endfor %}
+        <th>アクション</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row_index, row in rows %}
+      <tr>
+        {% for cell in row %}
+          <td>{{ cell }}</td>
+        {% endfor %}
+        <td>
+          <form action="/interest" method="POST">
+            <input type="hidden" name="row_index" value="{{ row_index }}">
+            <input type="hidden" name="user_id" value=""> <!-- LIFFで埋める -->
+            <button type="submit">興味あり</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
 </html>
