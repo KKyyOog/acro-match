@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from dotenv import load_dotenv
 import requests
 import os
 import json
@@ -111,13 +112,16 @@ def find_matching_alb(sheet, area, experience_required, datetime_str):
 
 # ------------------------ LINE通知 ------------------------
 
+load_dotenv()
 LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
+
+print(f"LINE_ACCESS_TOKEN: {LINE_ACCESS_TOKEN}")
 
 def line_notify(to, message):
     """Send a LINE notification."""
     url = "https://api.line.me/v2/bot/message/push"
     headers = {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json; charset=UTF-8",
         "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
     }
     body = {
@@ -126,11 +130,11 @@ def line_notify(to, message):
     }
     try:
         response = requests.post(url, headers=headers, json=body)
-        logging.info(f"📤 LINE送信先: {to}")
-        logging.info(f"📩 メッセージ: {message}")
-        logging.info(f"✅ 通知結果: {response.status_code} - {response.text}")
+        print(f"📤 LINE送信先: {to}")
+        print(f"📩 メッセージ: {message}")
+        print(f"✅ 通知結果: {response.status_code} - {response.text}")
     except Exception as e:
-        logging.error(f"❌ LINE通知エラー: {e}")
+        print(f"❌ LINE通知エラー: {e}")
 
 
 @app.route('/notify_school', methods=['POST'])
@@ -222,10 +226,32 @@ def view_classrooms():
     settings = load_settings()
     sheet = get_sheet("教室登録シート")
     headers = sheet.row_values(1)
-    rows = sheet.get_all_values()[1:]  # 1行目はヘッダーなのでスキップ
-    return render_template('view_classrooms.html', headers=headers, rows=rows, settings=settings)
+    rows = sheet.get_all_values()[1:]  # データ行のみ
+    indexed_rows = [(i + 2, row) for i, row in enumerate(rows)]  # 行番号とセット
+    return render_template('view_classrooms.html', headers=headers, rows=indexed_rows, settings=settings)
+
+@app.route("/interest", methods=["POST"])
+def notify_interest_to_classroom_owner():
+    try:
+        row_index = int(request.form.get("row_index"))
+        sheet = get_sheet("教室登録シート")
+        user_id = sheet.cell(row_index, 5).value  # 5列目 = user_id列
+
+        if user_id:
+            school_name = sheet.cell(row_index, 1).value
+            message = f"あなたが登録した教室「{school_name}」に興味を持った人がいます！"
+            line_notify(user_id, message)
+            return "通知を送信しました。戻るボタンで一覧に戻ってください。"
+        else:
+            return "通知先のuser_idが見つかりません。", 400
+    except Exception as e:
+        print(f"/interest エラー: {e}")
+        return "Internal Server Error", 500
+
 
 if __name__ == "__main__":
     test_user_id = "Uxxxxxxxxxxxxxxxxxx"  # あなたのLINE user_id に置き換える
     line_notify(test_user_id, "テスト通知：LINE通知確認用メッセージです")
     app.run(debug=True)
+
+
