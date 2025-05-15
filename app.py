@@ -4,6 +4,11 @@ from oauth2client.service_account import ServiceAccountCredentials
 import requests
 import os
 import json
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+import logging
+logging.basicConfig(level=logging.INFO)
+
 
 app = Flask(__name__)
 
@@ -120,9 +125,12 @@ def line_notify(to, message):
         "messages": [{"type": "text", "text": message}]
     }
     try:
-        requests.post(url, headers=headers, json=body)
+        response = requests.post(url, headers=headers, json=body)
+        logging.info(f"📤 LINE送信先: {to}")
+        logging.info(f"📩 メッセージ: {message}")
+        logging.info(f"✅ 通知結果: {response.status_code} - {response.text}")
     except Exception as e:
-        print(f"⚠️ LINE通知エラー: {e}")
+        logging.error(f"❌ LINE通知エラー: {e}")
 
 
 @app.route('/notify_school', methods=['POST'])
@@ -161,7 +169,7 @@ def submit():
         sheet.append_row([name, location, datetime_str, experience, user_id])
         return "教室登録と通知が完了しました！LINEに戻ってください。"
     except Exception as e:
-        print(f"❌ 教室登録エラー: {e}")
+        print(f"教室登録エラー: {e}")
         return "Internal Server Error", 500
 
 # ------------------------ アルバイト側 ------------------------
@@ -201,11 +209,11 @@ def submit_alb():
         if user_id:
             line_notify(user_id, f"{name}さん、アルバイト登録ありがとうございます！")
         else:
-            print("⚠️ user_idがNoneです。LINE通知はスキップされました。")
+            print("user_idがNoneです。LINE通知はスキップされました。")
 
         return "登録が完了しました！"
     except Exception as e:
-        print(f"❌ submit_alb エラー: {e}")
+        print(f"submit_alb エラー: {e}")
         return "Internal Server Error", 500
     
 
@@ -216,3 +224,8 @@ def view_classrooms():
     headers = sheet.row_values(1)
     rows = sheet.get_all_values()[1:]  # 1行目はヘッダーなのでスキップ
     return render_template('view_classrooms.html', headers=headers, rows=rows, settings=settings)
+
+if __name__ == "__main__":
+    test_user_id = "Uxxxxxxxxxxxxxxxxxx"  # あなたのLINE user_id に置き換える
+    line_notify(test_user_id, "テスト通知：LINE通知確認用メッセージです")
+    app.run(debug=True)
