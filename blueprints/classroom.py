@@ -1,6 +1,8 @@
 from flask import Blueprint, request, render_template
 from utils.sheets import get_sheet, load_settings, find_matching_alb
 from utils.notify import send_line_message
+from utils.liff import get_liff_id
+
 
 classroom_bp = Blueprint('classroom', __name__)
 
