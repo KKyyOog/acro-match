@@ -1,5 +1,6 @@
 from flask import Blueprint, request, render_template
 from utils.sheets import get_sheet, load_settings
+from utils.liff import get_liff_id
 
 alb_bp = Blueprint('alb', __name__)
 
