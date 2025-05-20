@@ -1,11 +1,10 @@
 from flask import Blueprint, request
 import json
-from utils.notify import send_line_message
-import sys
 import os
+import sys
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils.notify import send_line_message
-
 
 callback_bp = Blueprint("callback", __name__)
 
@@ -22,8 +21,6 @@ def callback():
                 send_line_message(user_id, "友だち追加ありがとうございます！")
         return "OK"
     except Exception as e:
-        print("❌ Webhook処理エラー:", e)
+        import traceback
+        print("❌ Webhook処理エラー:\n", traceback.format_exc())
         return "Error", 500
-
-success = send_line_message(user_id, "友だち追加ありがとうございます！")
-print("📤 通知送信成功？", success)
