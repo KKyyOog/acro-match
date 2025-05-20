@@ -1,32 +1,56 @@
 from flask import Blueprint, request, render_template, redirect
 from utils.sheets import load_settings, save_settings
+import json
+
+def load_settings():
+    with open("settings.json", "r", encoding="utf-8") as f:
+        return json.load(f)
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-@admin_bp.route('/', methods=['GET', 'POST'])
+@admin_bp.route("/", methods=["GET", "POST"])
 def admin():
-    if request.method == 'POST':
-        new_settings = {
-            "title": request.form.get("title"),
-            "button_color": request.form.get("button_color"),
-            "form_label_name": request.form.get("form_label_name"),
-            "form_label_area": request.form.get("form_label_area"),
-            "form_label_available": request.form.get("form_label_available"),
-            "classroom_title": request.form.get("classroom_title"),
-            "form_label_classroom_name": request.form.get("form_label_classroom_name"),
-            "form_label_classroom_location": request.form.get("form_label_classroom_location"),
-            "form_label_classroom_date": request.form.get("form_label_classroom_date"),
-            "form_label_classroom_experience": request.form.get("form_label_classroom_experience"),
-            "custom_fields": []
-        }
-        custom_count = int(request.form.get("custom_count", 0))
-        for i in range(1, custom_count + 1):
-            label = request.form.get(f"custom_label_{i}")
-            name = request.form.get(f"custom_name_{i}")
+    if request.method == "POST":
+        settings = {}
+
+        # アルバイト用設定
+        settings["form_title"] = request.form.get("form_title", "")
+        settings["form_button_color"] = request.form.get("form_button_color", "")
+        settings["form_label_name"] = request.form.get("form_label_name", "")
+        settings["form_label_area"] = request.form.get("form_label_area", "")
+        settings["form_label_available"] = request.form.get("form_label_available", "")
+
+        form_count = int(request.form.get("custom_form_count", 0))
+        form_fields = []
+        for i in range(1, form_count + 1):
+            label = request.form.get(f"custom_form_label_{i}")
+            name = request.form.get(f"custom_form_name_{i}")
             if label and name:
-                new_settings["custom_fields"].append({"label": label, "name": name})
-        save_settings(new_settings)
-        return redirect('/admin')
-    
-    current_settings = load_settings()
-    return render_template('admin.html', settings=current_settings)
+                form_fields.append({"label": label, "name": name})
+        settings["custom_fields_form"] = form_fields
+
+        # 教室用設定
+        settings["classroom_title"] = request.form.get("classroom_title", "")
+        settings["form_label_classroom_name"] = request.form.get("form_label_classroom_name", "")
+        settings["form_label_classroom_location"] = request.form.get("form_label_classroom_location", "")
+        settings["form_label_classroom_date"] = request.form.get("form_label_classroom_date", "")
+        settings["form_label_classroom_experience"] = request.form.get("form_label_classroom_experience", "")
+
+        classroom_count = int(request.form.get("custom_classroom_count", 0))
+        classroom_fields = []
+        for i in range(1, classroom_count + 1):
+            label = request.form.get(f"custom_classroom_label_{i}")
+            name = request.form.get(f"custom_classroom_name_{i}")
+            if label and name:
+                classroom_fields.append({"label": label, "name": name})
+        settings["custom_fields_classroom"] = classroom_fields
+
+        # JSONに保存
+        with open("settings.json", "w", encoding="utf-8") as f:
+            json.dump(settings, f, ensure_ascii=False, indent=2)
+
+        return redirect("/admin")
+
+    # GET時は読み込んで表示
+    settings = load_settings()
+    return render_template("admin.html", settings=settings)

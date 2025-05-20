@@ -24,3 +24,6 @@ def callback():
     except Exception as e:
         print("❌ Webhook処理エラー:", e)
         return "Error", 500
+
+success = send_line_message(user_id, "友だち追加ありがとうございます！")
+print("📤 通知送信成功？", success)

@@ -69,21 +69,38 @@
 
     <input type="hidden" name="user_id" id="user_id">
 
-    <label for="name">{{ settings.form_label_classroom_name | default("教室名") }}</label>
+    <label for="name">{{ settings.form_label_classroom_name | default("教室名/イベント名") }}</label>
     <input type="text" name="name" id="name" required>
 
     <label for="location">{{ settings.form_label_classroom_location | default("場所") }}</label>
     <input type="text" name="location" id="location" required>
 
-    <label for="date">{{ settings.form_label_classroom_date | default("募集日時") }}</label>
-    <input type="datetime-local" name="date" id="date" required>
+   <!-- 募集日時 -->
+<section>
+  <label for="date">{{ settings.form_label_classroom_date | default("募集日時") }}</label>
+  <input type="datetime-local" name="date" id="date" required>
+</section>
 
-    <label for="experience">{{ settings.form_label_classroom_experience | default("希望する経験") }}</label>
-    <select name="experience" id="experience">
-      <option value="体操経験者">体操経験者</option>
-      <option value="補助可能">補助可能</option>
-      <option value="チアリーディング可">チアリーディング可</option>
-    </select>
+<!-- 希望する経験 -->
+<section>
+  <label for="experience">{{ settings.form_label_classroom_experience | default("希望する経験（複数選択可）") }}</label>
+  <select name="experience" id="experience" multiple size="5">
+    <option value="体操">体操</option>
+    <option value="パルクール">パルクール</option>
+    <option value="トリッキング">トリッキング</option>
+    <option value="チアリーディング">チアリーディング</option>
+    <option value="ダンス">ダンス</option>
+    <option value="おとな補助">おとな補助</option>
+    <option value="こども補助">こども補助</option>
+  </select>
+</section>
+
+<!-- その他自由記述 -->
+<section>
+  <label for="notes">その他ご要望・自由記述</label>
+  <textarea name="notes" id="notes" rows="4" style="width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 8px;"></textarea>
+</section>
+
 
     {% for field in settings.custom_fields %}
       <label for="{{ field.name }}">{{ field.label }}</label>
