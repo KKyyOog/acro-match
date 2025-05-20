@@ -73,17 +73,19 @@
     <label for="name">{{ settings.form_label_name | default("お名前") }}</label>
     <input type="text" name="name" id="name" required>
 
-    <label for="gym">体操経験：</label>
-    <select name="gym" id="gym">
-      <option value="あり">あり</option>
-      <option value="なし">なし</option>
-    </select>
-
-    <label for="cheer">チア経験：</label>
-    <select name="cheer" id="cheer">
-      <option value="あり">あり</option>
-      <option value="なし">なし</option>
-    </select>
+   <!-- 希望する経験 -->
+<section>
+  <label for="experience">{{ settings.form_label_alb_experience | default("経験（複数選択可）") }}</label>
+  <select name="experience" id="experience" multiple size="5">
+    <option value="体操">体操</option>
+    <option value="パルクール">パルクール</option>
+    <option value="トリッキング">トリッキング</option>
+    <option value="チアリーディング">チアリーディング</option>
+    <option value="ダンス">ダンス</option>
+    <option value="おとな補助">おとな補助</option>
+    <option value="こども補助">こども補助</option>
+  </select>
+</section>
 
     <label for="area">{{ settings.form_label_area | default("希望エリア") }}</label>
     <input type="text" name="area" id="area" required>

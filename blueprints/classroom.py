@@ -16,17 +16,22 @@ def index():
 def submit():
     try:
         sheet = get_sheet("教室登録シート")
+
+        experience_list = request.form.getlist("experience")
+        experience_str = ", ".join(experience_list)
+
         sheet.append_row([
             request.form.get("name"),
             request.form.get("location"),
             request.form.get("date"),
-            request.form.get("experience"),
+            experience_str,
             request.form.get("user_id")
         ])
         return "教室登録が完了しました！LINEに戻ってください。"
     except Exception as e:
         print(f"教室登録エラー: {e}")
         return "Internal Server Error", 500
+
 
 @classroom_bp.route("/recruit")
 def view_classrooms():
