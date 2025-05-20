@@ -59,3 +59,21 @@ def get_liff_id(context="default"):
         "alb": os.getenv("LIFF_ID_alb", ""),
         "recruit": os.getenv("LIFF_ID_recruit", ""),
     }.get(context, "")
+
+def update_sheet_headers_for_alb(sheet, settings):
+    headers = [
+        settings.get("form_label_name", "名前"),
+        settings.get("form_label_alb_experience", "経験"),
+        settings.get("form_label_area", "エリア"),
+        settings.get("form_label_available", "出勤可能日・時間")
+    ]
+
+    # カスタム項目のラベルも追加
+    for field in settings.get("custom_fields", []):
+        headers.append(field.get("label", ""))
+
+    headers.append("user_id")
+
+    # 1行目を上書き
+    sheet.delete_rows(1)  # 古いヘッダーを削除
+    sheet.insert_row(headers, index=1)

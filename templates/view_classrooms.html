@@ -61,7 +61,7 @@
   <table>
     <thead>
       <tr>
-        {% for header in headers[:-1] %}
+        {% for header in headers[:-1] %}  {# 最後の列 (user_id) を非表示 #}
           <th>{{ header }}</th>
         {% endfor %}
         <th>アクション</th>
@@ -70,7 +70,7 @@
     <tbody>
       {% for row_index, row in rows %}
       <tr>
-        {% for cell in row %}
+        {% for cell in row[:-1] %}  {# 最後の列 (user_id) を非表示 #}
           <td>
             {% if cell is iterable and not cell|string %}
               {{ cell | join(", ") }}
@@ -81,10 +81,3 @@
         {% endfor %}
         <td>
           <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</body>
-</html>
