@@ -68,16 +68,20 @@
       </tr>
     </thead>
     <tbody>
-      {% for row_index, row in rows %}
-      <tr>
-        {% for cell in row[:-1] %}  {# 最後の列 (user_id) を非表示 #}
-          <td>
-            {% if cell is iterable and not cell|string %}
-              {{ cell | join(", ") }}
-            {% else %}
-              {{ cell }}
-            {% endif %}
-          </td>
-        {% endfor %}
-        <td>
-          <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
+  {% for row_index, row in rows %}
+  <tr>
+    {% for cell in row[:-1] %}
+      <td>
+        {% if cell is iterable and not cell|string %}
+          {{ cell | join(", ") }}
+        {% else %}
+          {{ cell }}
+        {% endif %}
+      </td>
+    {% endfor %}
+    <td>
+      <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
