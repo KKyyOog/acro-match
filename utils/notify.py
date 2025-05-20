@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+
 load_dotenv()
 
 LINE_API_URL = "https://api.line.me/v2/bot/message/push"
@@ -24,7 +25,8 @@ def send_line_message(user_id, message_text):
     print("✅ 通知送信成功")
     return True
 
-#if __name__ == "__main__":
+# テスト用に直接実行される場合
+if __name__ == "__main__":
     test_user_id = "U90ce70715f2e5f6eddfc0dab100afc17"
     success = send_line_message(test_user_id, "テスト通知です")
     print("✅ 通知送信成功:", success)
