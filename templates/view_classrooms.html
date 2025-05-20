@@ -10,31 +10,34 @@
     th { background-color: #f0f0f0; }
     h1 { text-align: center; margin-bottom: 1.5rem; }
   </style>
+  
+  <form onsubmit="return submitForm(this, {{ row_index }});">
+    <button type="submit">興味あり</button>
+  </form>
 
   <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     const LIFF_ID = "{{ liff_id | safe }}";
 
-    async function initializeLIFF() {
-      try {
-        await liff.init({ liffId: LIFF_ID });
+    async function submitForm(formElement, rowIndex) {
+    try {
+      const profile = await liff.getProfile();
+      const userId = profile.userId;
 
-        if (!liff.isLoggedIn()) {
-          liff.login();
-          return;
-        }
+      await fetch("/interest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, row_index: rowIndex })
+      });
 
-        const profile = await liff.getProfile();
-        document.querySelectorAll('input[name="user_id"]').forEach(el => {
-          el.value = profile.userId;
-        });
-
-      } catch (error) {
-        console.error("LIFF initialization failed:", error);
-        alert("LINEログインに失敗しました。拡張機能や環境を見直してください。");
-      }
+      alert("送信しました！");
+    } catch (err) {
+      alert("エラーが発生しました：" + err);
     }
+
+    return false; // フォームの標準動作をキャンセル
+  }
 
     window.onload = initializeLIFF;
   </script>
