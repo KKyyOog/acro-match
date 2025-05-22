@@ -26,8 +26,8 @@ def send_line_message(user_id, message_text):
     return True
 
 # テスト用に直接実行される場合
-if __name__ == "__main__":
-    test_user_id = "U90ce70715f2e5f6eddfc0dab100afc17"
-    success = send_line_message(test_user_id, "テスト通知です")
-    print("✅ 通知送信成功:", success)
-    print("✅ 新規フォローユーザーID:", test_user_id)
+#if __name__ == "__main__":
+#    test_user_id = "U90ce70715f2e5f6eddfc0dab100afc17"
+#    success = send_line_message(test_user_id, "テスト通知です")
+#    print("✅ 通知送信成功:", success)
+#    print("✅ 新規フォローユーザーID:", test_user_id)

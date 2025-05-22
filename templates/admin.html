@@ -8,6 +8,7 @@
   <h2>アルバイト登録フォーム設定</h2>
 
   <form method="POST">
+    {{ csrf_token() }}
     <label>タイトル:</label>
     <input type="text" name="form_title" value="{{ settings.form_title }}"><br>
 
