@@ -18,7 +18,7 @@ def callback():
             if event.get("type") == "follow":
                 user_id = event["source"]["userId"]
                 print("✅ 新規フォローユーザーID:", user_id)
-                send_line_message(user_id, "友だち追加ありがとうございます！")
+                send_line_message(user_id, "友だち追加ありがとうございます！早速募集一覧で募集を探してみましょう！")
         return "OK"
     except Exception as e:
         import traceback

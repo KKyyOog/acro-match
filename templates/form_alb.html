@@ -83,8 +83,25 @@
     <option value="トリッキング">トリッキング</option>
     <option value="チアリーディング">チアリーディング</option>
     <option value="ダンス">ダンス</option>
-    <option value="おとな補助">おとな補助</option>
-    <option value="こども補助">こども補助</option>
+  </select>
+</section>
+
+<!-- 補助レベル -->
+<section>
+  <label for="handslevel">{{ settings.form_label_classroom_handslevel | default("補助レベル（複数選択可）") }}</label>
+  <select name="handslevel" id="handslevel" multiple size="5">
+    <option value="経験なし">経験なし</option>
+    <option value="おとな">おとな</option>
+    <option value="学生">学生</option>
+    <option value="こども">こども</option>
+    <option value="バク転">バク転</option>
+    <option value="バク宙">バク宙</option>
+    <option value="ロンバク">ロンバク</option>
+    <option value="ロン宙">ロン宙</option>
+    <option value="ひねり">ひねり</option>
+    <option value="前宙">前宙</option>
+    <option value="転回">転回</option>
+    <option value="側宙">側宙</option>
   </select>
 </section>
 

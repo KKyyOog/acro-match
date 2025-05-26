@@ -53,7 +53,7 @@ def submit():
         row.append(request.form.get("user_id", ""))
 
         sheet.append_row(row)
-        return "教室登録が完了しました！LINEに戻ってください。"
+        return "教室登録が完了しました！募集一覧に掲載されているかご確認ください。"
     except Exception as e:
         print(f"教室登録エラー: {e}")
         return "Internal Server Error", 500
