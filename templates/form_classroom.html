@@ -65,7 +65,7 @@
 </head>
 <body>
   <form action="/submit" method="post">
-    {{ csrf_token() }}
+   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 style="text-align: center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>
 
     <input type="hidden" name="user_id" id="user_id">
@@ -98,7 +98,7 @@
 <section>
   <label for="handslevel">{{ settings.form_label_classroom_handslevel | default("補助レベル（複数選択可）") }}</label>
   <select name="handslevel" id="handslevel" multiple size="5">
-    <option value="経験なし">経験なし</option>
+    <option value="未経験歓迎">未経験歓迎</option>
     <option value="おとな">おとな</option>
     <option value="学生">学生</option>
     <option value="こども">こども</option>

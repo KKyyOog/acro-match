@@ -4,14 +4,32 @@
   <meta charset="UTF-8">
   <title>{{ settings.classroom_title | default("教室登録一覧") }}</title>
   <style>
-    body { font-family: sans-serif; padding: 2rem; background: #f9f9f9; }
-    table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    th, td { padding: 1rem; border: 1px solid #ccc; text-align: left; }
-    th { background-color: #f0f0f0; }
-    h1 { text-align: center; margin-bottom: 1.5rem; }
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f9f9f9;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      padding: 1rem;
+      border: 1px solid #ccc;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
   </style>
 
-  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     const LIFF_ID = "{{ liff_id | safe }}";
@@ -19,14 +37,11 @@
     async function initializeLIFF() {
       try {
         await liff.init({ liffId: LIFF_ID });
-
         if (!liff.isLoggedIn()) {
           liff.login();
           return;
         }
-
         window.userId = (await liff.getProfile()).userId;
-
       } catch (error) {
         console.error("LIFF initialization failed:", error);
         alert("LINEログインに失敗しました。拡張機能や環境を見直してください。");
@@ -45,7 +60,6 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id: window.userId, row_index: rowIndex })
         });
-
         alert("送信しました！");
       } catch (err) {
         alert("送信エラー：" + err);
@@ -61,27 +75,42 @@
   <table>
     <thead>
       <tr>
-        {% for header in headers[:-1] %}  {# 最後の列 (user_id) を非表示 #}
+        {% for header in headers[:-1] %}
           <th>{{ header }}</th>
         {% endfor %}
         <th>アクション</th>
       </tr>
     </thead>
     <tbody>
-  {% for row_index, row in rows %}
-  <tr>
-    {% for cell in row[:-1] %}
-      <td>
-        {% if cell is iterable and not cell|string %}
-          {{ cell | join(", ") }}
-        {% else %}
-          {{ cell }}
-        {% endif %}
-      </td>
-    {% endfor %}
-    <td>
-      <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
+      {% for row_index, row in rows %}
+        <tr>
+          {% for col_index, cell in enumerate(row[:-1]) %}
+            <td>
+              {% if headers[col_index] == settings.form_label_classroom_date %}
+                {% set parts = cell.split() %}
+                {% if parts|length == 2 %}
+                  {% set date_parts = parts[0].split("-") %}
+                  {% set time_parts = parts[1].split(":") %}
+                  <div>{{ date_parts[1]|int }}/{{ date_parts[2]|int }}</div>
+                  <div>{{ time_parts[0]|int }}:{{ "%02d"|format(time_parts[1]|int) }}</div>
+                {% else %}
+                  {{ cell }}
+                {% endif %}
+              {% else %}
+                {% if cell is iterable and not cell|string %}
+                  {{ cell | join(", ") }}
+                {% else %}
+                  {{ cell }}
+                {% endif %}
+              {% endif %}
+            </td>
+          {% endfor %}
+          <td>
+            <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
