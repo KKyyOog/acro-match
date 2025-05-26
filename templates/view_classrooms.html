@@ -84,27 +84,29 @@
     <tbody>
       {% for row_index, row in rows %}
         <tr>
-          {% for col_index, cell in enumerate(row[:-1]) %}
-            <td>
-              {% if headers[col_index] == settings.form_label_classroom_date %}
-                {% set parts = cell.split() %}
-                {% if parts|length == 2 %}
-                  {% set date_parts = parts[0].split("-") %}
-                  {% set time_parts = parts[1].split(":") %}
-                  <div>{{ date_parts[1]|int }}/{{ date_parts[2]|int }}</div>
-                  <div>{{ time_parts[0]|int }}:{{ "%02d"|format(time_parts[1]|int) }}</div>
-                {% else %}
-                  {{ cell }}
-                {% endif %}
-              {% else %}
-                {% if cell is iterable and not cell|string %}
-                  {{ cell | join(", ") }}
-                {% else %}
-                  {{ cell }}
-                {% endif %}
-              {% endif %}
-            </td>
-          {% endfor %}
+         {% for cell in row[:-1] %}
+  {% set col_index = loop.index0 %}
+  <td>
+    {% if headers[col_index] == settings.form_label_classroom_date %}
+      {% set parts = cell.split() %}
+      {% if parts|length == 2 %}
+        {% set date_parts = parts[0].split("-") %}
+        {% set time_parts = parts[1].split(":") %}
+        <div>{{ date_parts[1]|int }}/{{ date_parts[2]|int }}</div>
+        <div>{{ time_parts[0]|int }}:{{ "%02d"|format(time_parts[1]|int) }}</div>
+      {% else %}
+        {{ cell }}
+      {% endif %}
+    {% else %}
+      {% if cell is iterable and not cell|string %}
+        {{ cell | join(", ") }}
+      {% else %}
+        {{ cell }}
+      {% endif %}
+    {% endif %}
+  </td>
+{% endfor %}
+
           <td>
             <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
           </td>
