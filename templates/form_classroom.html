@@ -115,7 +115,7 @@
 
 <!-- その他自由記述 -->
 <section>
-  <label for="notes">その他ご要望・自由記述</label>
+  <label for="notes">{{ settings.form_label_classroom_notes | default("その他ご要望・自由記述") }}</label>
   <textarea name="notes" id="notes" rows="4" style="width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 8px;"></textarea>
 </section>
 
