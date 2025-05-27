@@ -28,13 +28,14 @@
       border-radius: 8px;
     }
     button {
-      color: white;
-      padding: 1rem;
-      border: none;
-      border-radius: 30px;
-      width: 100%;
-      font-size: 1rem;
-    }
+          color: white;
+          padding: 1rem;
+          border: none;
+          border-radius: 30px;
+          width: 100%;
+          font-size: 1rem;
+          background: var(--button-color, #06c755);
+        }
   </style>
 
   <!-- LINE LIFF SDK -->
@@ -63,8 +64,7 @@
     window.onload = initializeLIFF;
   </script>
 </head>
-<body>
-  <form action="/submit" method="post">
+  <form action="/submit" method="post" style="--button-color: {{ settings.button_color | default('#06c755') }};">
    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 style="text-align: center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>
 
@@ -125,10 +125,10 @@
       <input type="text" name="{{ field.name }}" id="{{ field.name }}">
     {% endfor %}
 
-    <button type="submit"
-      style="background: {{ settings.button_color | default('#06c755') }};">
+    <button type="submit">
       送信
     </button>
+  </form>
   </form>
 </body>
 </html>
