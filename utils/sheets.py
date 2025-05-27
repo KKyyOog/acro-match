@@ -69,11 +69,12 @@ def get_liff_id(context="default"):
 ### アルバイト登録シートのヘッダー更新
 def update_sheet_headers_for_alb(sheet, settings):
     headers = [
-        settings.get("form_label_alb_name", "名前"),
-        settings.get("form_label_alb_experience", "経験"),
-        settings.get("form_label_alb_handslevel", "補助レベル"),
+        settings.get("form_label_alb_name", "ニックネーム"),
+        settings.get("form_label_alb_experience", "経験（複数選択可）"),
+        settings.get("form_label_alb_handslevel", "補助レベル（複数選択可）"),
         settings.get("form_label_area", "希望エリア"),
         settings.get("form_label_available", "稼働可能日・時間"),
+        settings.get("form_label_reachtime", "連絡可能時間帯"),
     ]
     for field in settings.get("custom_fields", []):
         headers.append(field.get("label", ""))
@@ -84,13 +85,13 @@ def update_sheet_headers_for_alb(sheet, settings):
 ### 教室登録シートのヘッダー更新
 def update_sheet_headers_for_classroom(sheet, settings):
     headers = [
-        settings.get("form_label_classroom_name", "教室名"),
-        settings.get("form_label_classroom_location", "場所"),
-        settings.get("form_label_classroom_date", "募集日時"),
-        settings.get("form_label_classroom_experience", "希望する経験"),
-        settings.get("form_label_classroom_handslevel", "補助レベル"),
-        settings.get("form_label_classroom_notes", "その他ご要望・自由記述"),
-    ]
+    settings.get("form_label_classroom_name", "教室名/イベント名"),
+    settings.get("form_label_classroom_location", "場所"),
+    settings.get("form_label_classroom_date", "募集日時"),
+    settings.get("form_label_classroom_experience", "希望する経験"),
+    settings.get("form_label_classroom_handslevel", "補助レベル（複数選択可）"),
+    settings.get("form_label_classroom_notes", "その他ご要望・自由記述"),
+]
     for field in settings.get("custom_fields_classroom", []):
         headers.append(field.get("label", ""))
     headers.append("user_id")
