@@ -34,6 +34,11 @@ def load_settings():
     try:
         with open("settings.json", "r", encoding="utf-8") as f:
             saved = json.load(f)
+
+        # フォーム互換変換
+        if "custom_fields_form" in saved:
+            saved["custom_fields"] = saved["custom_fields_form"]
+
         return {**default_settings, **saved}
     except Exception as e:
         print(f"⚠️ load_settings error: {e}")
@@ -66,7 +71,7 @@ def update_sheet_headers_for_alb(sheet, settings):
     headers = [
         settings.get("form_label_name", "名前"),
         settings.get("form_label_alb_experience", "経験"),
-        settings.get("form_label_classroom_handslevel", "補助レベル"),
+        settings.get("form_label_alb_handslevel", "補助レベル"),
         settings.get("form_label_area", "希望エリア"),
         settings.get("form_label_available", "稼働可能日・時間"),
     ]
