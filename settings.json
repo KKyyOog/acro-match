@@ -6,16 +6,8 @@
   "form_label_alb_handslevel": "補助レベル（複数選択可）",
   "form_label_area": "希望エリア",
   "form_label_available": "稼働可能日・時間",
-  "custom_fields_form": [
-    {
-      "label": "資格・スキル",
-      "name": "skills"
-    },
-    {
-      "label": "連絡可能時間帯",
-      "name": "contact_time"
-    }
-  ],
+  "form_label_reachtime": "連絡可能時間帯",
+  "custom_fields_form": [],
   "classroom_title": "教室登録",
   "form_label_classroom_name": "教室名/イベント名",
   "form_label_classroom_location": "場所",

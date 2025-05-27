@@ -69,7 +69,7 @@ def get_liff_id(context="default"):
 ### アルバイト登録シートのヘッダー更新
 def update_sheet_headers_for_alb(sheet, settings):
     headers = [
-        settings.get("form_label_name", "名前"),
+        settings.get("form_label_alb_name", "名前"),
         settings.get("form_label_alb_experience", "経験"),
         settings.get("form_label_alb_handslevel", "補助レベル"),
         settings.get("form_label_area", "希望エリア"),
