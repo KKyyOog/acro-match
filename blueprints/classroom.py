@@ -11,7 +11,9 @@ def update_sheet_headers_for_classroom(sheet, settings):
         settings.get("form_label_classroom_name", "教室名"),
         settings.get("form_label_classroom_location", "場所"),
         settings.get("form_label_classroom_date", "募集日時"),
-        settings.get("form_label_classroom_experience", "希望する経験")
+        settings.get("form_label_classroom_experience", "希望する経験（複数選択可")
+        settings.get("form_label_classroom_handslevel", "補助レベル（複数選択可）"),
+        settings.get("form_label_classroom_notes", "その他ご要望・自由記述"),
     ]
     for field in settings.get("custom_fields_classroom", []):
         headers.append(field.get("label", ""))
@@ -32,31 +34,47 @@ def submit():
         settings = load_settings()
         sheet = get_sheet("教室登録シート")
 
-        # ✅ ヘッダーを更新
+        # ✅ ヘッダー更新
         update_sheet_headers_for_classroom(sheet, settings)
 
         # 🔁 フォーム入力の取得
+        name = request.form.get("name")
+        location = request.form.get("location")
+        date = request.form.get("date")
+
         experience_list = request.form.getlist("experience")
         experience_str = ", ".join(experience_list)
 
+        handslevel_list = request.form.getlist("handslevel")
+        handslevel_str = ", ".join(handslevel_list)
+
+        notes = request.form.get("notes", "")
+
+        # 📋 書き込む行の初期データ
         row = [
-            request.form.get("name"),
-            request.form.get("location"),
-            request.form.get("date"),
+            name,
+            location,
+            date,
             experience_str,
+            handslevel_str,
+            notes
         ]
 
-        # 🔁 カスタム項目も取得
+        # 🧩 カスタム項目を追加
         for field in settings.get("custom_fields_classroom", []):
             row.append(request.form.get(field.get("name", ""), ""))
 
+        # 🆔 LINE user_id を最後に追加
         row.append(request.form.get("user_id", ""))
 
+        # 📤 Google Sheets に追記
         sheet.append_row(row)
+
         return "教室登録が完了しました！募集一覧に掲載されているかご確認ください。"
     except Exception as e:
         print(f"教室登録エラー: {e}")
         return "Internal Server Error", 500
+
 
 @classroom_bp.route("/recruit")
 def view_classrooms():

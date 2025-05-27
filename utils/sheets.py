@@ -88,7 +88,7 @@ def update_sheet_headers_for_classroom(sheet, settings):
     settings.get("form_label_classroom_name", "教室名/イベント名"),
     settings.get("form_label_classroom_location", "場所"),
     settings.get("form_label_classroom_date", "募集日時"),
-    settings.get("form_label_classroom_experience", "希望する経験"),
+    settings.get("form_label_classroom_experience", "希望する経験（複数選択可"),
     settings.get("form_label_classroom_handslevel", "補助レベル（複数選択可）"),
     settings.get("form_label_classroom_notes", "その他ご要望・自由記述"),
 ]
