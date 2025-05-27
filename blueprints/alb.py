@@ -10,7 +10,8 @@ def update_sheet_headers_for_alb(sheet, settings):
         settings.get("form_label_name", "名前"),
         settings.get("form_label_alb_experience", "経験"),
         settings.get("form_label_area", "希望エリア"),
-        settings.get("form_label_available", "稼働可能日・時間")
+        settings.get("form_label_available", "稼働可能日・時間"),
+        settings.get("form_label_reachtime", "連絡可能時間帯"),
     ]
 
     # カスタム項目のラベルを追加

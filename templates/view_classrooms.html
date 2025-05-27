@@ -24,6 +24,11 @@
     th {
       background-color: #f0f0f0;
     }
+    .clickable {
+      color: #007bff;
+      cursor: pointer;
+      text-decoration: underline;
+    }
     h1 {
       text-align: center;
       margin-bottom: 1.5rem;
@@ -44,7 +49,7 @@
         window.userId = (await liff.getProfile()).userId;
       } catch (error) {
         console.error("LIFF initialization failed:", error);
-        alert("LINEログインに失敗しました。拡張機能や環境を見直してください。");
+        alert("LINEログインに失敗しました。");
       }
     }
 
@@ -66,6 +71,14 @@
       }
     }
 
+    function showNotes(notes) {
+      if (notes && notes.trim()) {
+        alert("📌 その他のご要望:\n\n" + notes);
+      } else {
+        alert("特記事項はありません。");
+      }
+    }
+
     window.onload = initializeLIFF;
   </script>
 </head>
@@ -75,38 +88,36 @@
   <table>
     <thead>
       <tr>
-        {% for header in headers[:-1] %}
-          <th>{{ header }}</th>
-        {% endfor %}
-        <th>アクション</th>
+        <th>教室名/イベント名</th>
+        <th>場所</th>
+        <th>募集日時</th>
+        <th>希望する経験</th>
+        <th>補助レベル</th>
+        <th>興味あり</th>
       </tr>
     </thead>
     <tbody>
       {% for row_index, row in rows %}
         <tr>
-          {% for cell in row[:-1] %}
-            {% set col_index = loop.index0 %}
-            <td>
-              {% if headers[col_index] == "募集日時" %}
-                {% set parts = cell.split("T") %}
-                {% if parts|length == 2 %}
-                  {% set date_parts = parts[0].split("-") %}
-                  {% set time_parts = parts[1].split(":") %}
-                  <div>{{ date_parts[1]|int }}/{{ date_parts[2]|int }}</div>
-                  <div>{{ time_parts[0]|int }}:{{ "%02d"|format(time_parts[1]|int) }}</div>
-                {% else %}
-                    {{ cell }}
-                {% endif %}
-              {% else %}
-                {% if cell is iterable and not cell|string %}
-                  {{ cell | join(", ") }}
-                {% else %}
-                  {{ cell }}
-                {% endif %}
-              {% endif %}
-            </td>
-          {% endfor %}
-
+          <td>
+            <span class="clickable" onclick="showNotes(`{{ row[5]|e }}`)">
+              {{ row[0] }}
+            </span>
+          </td>
+          <td>{{ row[1] }}</td>
+          <td>
+            {% set parts = row[2].split("T") %}
+            {% if parts|length == 2 %}
+              {% set date_parts = parts[0].split("-") %}
+              {% set time_parts = parts[1].split(":") %}
+              <div>{{ date_parts[1]|int }}/{{ date_parts[2]|int }}</div>
+              <div>{{ time_parts[0]|int }}:{{ "%02d"|format(time_parts[1]|int) }}</div>
+            {% else %}
+              {{ row[2] }}
+            {% endif %}
+          </td>
+          <td>{{ row[3] }}</td>
+          <td>{{ row[4] }}</td>
           <td>
             <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
           </td>
