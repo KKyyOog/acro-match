@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_wtf.csrf import CSRFProtect
 from blueprints.alb import alb_bp
 from blueprints.classroom import classroom_bp
@@ -18,3 +18,9 @@ app.register_blueprint(callback_bp)  # ← 追加
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+@app.before_request
+def log_request_data():
+    if request.method == "POST":
+        print("📦 Raw POSTヘッダー:", dict(request.headers))
+        print("📦 Raw POSTボディ:", request.get_data())
