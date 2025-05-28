@@ -1,5 +1,4 @@
 from flask import Blueprint, request
-from flask_wtf.csrf import csrf_exempt
 import json
 import os
 import sys
@@ -9,11 +8,10 @@ from utils.notify import send_line_message
 
 callback_bp = Blueprint("callback", __name__)
 
-@csrf_exempt
 @callback_bp.route("/callback", methods=["POST"])
 def callback():
     try:
-        print("📩 生データ:", request.data)  # ここで生のJSONデータを確認
+        print("📩 生データ:", request.data)
         data = request.get_json(force=True, silent=False)
         print("📩 Webhook受信データ:", data)
 
@@ -22,7 +20,7 @@ def callback():
             if event.get("type") == "follow":
                 user_id = event["source"]["userId"]
                 print("✅ 新規フォローユーザーID:", user_id)
-                send_line_message(user_id, "友だち追加ありがとうございます！早速募集一覧で募集を探してみましょう！")
+                send_line_message(user_id, "友だち追加ありがとうございます！")
 
         return "OK", 200
 
