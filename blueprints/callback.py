@@ -11,8 +11,8 @@ callback_bp = Blueprint("callback", __name__)
 @callback_bp.route("/callback", methods=["POST"])
 def callback():
     try:
-        # force=True で必ずJSONとして扱う
-        data = request.get_json(force=True)
+        print("📩 生データ:", request.data)  # ここで生のJSONデータを確認
+        data = request.get_json(force=True, silent=False)
         print("📩 Webhook受信データ:", data)
 
         events = data.get("events", [])
