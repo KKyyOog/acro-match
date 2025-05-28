@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_wtf.csrf import csrf_exempt
 import json
 import os
 import sys
@@ -8,6 +9,7 @@ from utils.notify import send_line_message
 
 callback_bp = Blueprint("callback", __name__)
 
+@csrf_exempt
 @callback_bp.route("/callback", methods=["POST"])
 def callback():
     try:
