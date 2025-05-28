@@ -88,25 +88,25 @@ def view_classrooms():
 
 @classroom_bp.route("/interest", methods=["POST"])
 def notify_interest():
-    row_index = int(request.form.get("row_index"))
-    user_id = request.form.get("user_id")  # アルバイトのLINE user_id
-
     try:
+        data = request.get_json()
+        row_index = int(data.get("row_index"))
+        user_id = data.get("user_id")  # 押した人（アルバイト）のuser_id
+
         sheet = get_sheet("教室登録シート")
         row = sheet.row_values(row_index)
 
         name = row[0]
         location = row[1]
         datetime_str = row[2]
-
-        target_line_id = "Uxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        target_line_id = row[-1]  # ✅ 行の最後の列が教室側user_idであると仮定
 
         message = (
             f"📢 アルバイトから興味ありの通知がありました！\n"
             f"教室名：{name}\n"
             f"場所：{location}\n"
             f"日時：{datetime_str}\n"
-            f"連絡先（user_id）：{user_id}"
+            f"連絡先：{user_id}"
         )
 
         send_line_message(target_line_id, message)
