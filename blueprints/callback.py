@@ -11,17 +11,20 @@ callback_bp = Blueprint("callback", __name__)
 @callback_bp.route("/callback", methods=["POST"])
 def callback():
     try:
-        body = request.get_json()
-        print("📩 Webhook受信:", body)
-        events = body.get("events", [])
+        # force=True で必ずJSONとして扱う
+        data = request.get_json(force=True)
+        print("📩 Webhook受信データ:", data)
+
+        events = data.get("events", [])
         for event in events:
             if event.get("type") == "follow":
                 user_id = event["source"]["userId"]
                 print("✅ 新規フォローユーザーID:", user_id)
                 send_line_message(user_id, "友だち追加ありがとうございます！早速募集一覧で募集を探してみましょう！")
-        return "OK"
+
+        return "OK", 200
+
     except Exception as e:
         import traceback
         print("❌ Webhook処理エラー:\n", traceback.format_exc())
         return "Error", 500
-
