@@ -110,3 +110,15 @@ def find_matching_alb(sheet, area, experience_required, datetime_str):
         if area_match or date_match or exp_match:
             matched.append(row.get("user_id"))
     return matched
+
+### user_id管理
+def add_user_with_name_if_new(user_id, name):
+    sheet = get_sheet("ユーザー一覧シート")
+    existing = sheet.get_all_values()[1:]
+    existing_ids = [row[0] for row in existing]
+
+    if user_id not in existing_ids:
+        sheet.append_row([user_id, name])
+        print(f"📝 新規登録: {user_id} / {name}")
+    else:
+        print(f"✅ 登録済: {user_id}")
