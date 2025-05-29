@@ -76,7 +76,7 @@
 
     <section>
       <label for="experience">{{ settings.form_label_alb_experience | default("経験（複数選択可）") }}</label>
-      <select name="experience" id="experience" multiple size="5">
+      <select name="experience[]" id="experience" multiple size="5">
         <option value="体操">体操</option>
         <option value="パルクール">パルクール</option>
         <option value="トリッキング">トリッキング</option>
@@ -87,7 +87,7 @@
 
     <section>
       <label for="handslevel">{{ settings.form_label_alb_handslevel | default("補助レベル（複数選択可）") }}</label>
-      <select name="handslevel" id="handslevel" multiple size="5">
+      <select name="handslevel[]" id="handslevel" multiple size="5">
         <option value="経験なし">経験なし</option>
         <option value="おとな">おとな</option>
         <option value="学生">学生</option>
