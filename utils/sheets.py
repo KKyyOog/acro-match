@@ -1,6 +1,7 @@
 import gspread
 import json
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -34,11 +35,8 @@ def load_settings():
     try:
         with open("settings.json", "r", encoding="utf-8") as f:
             saved = json.load(f)
-
-        # フォーム互換変換
         if "custom_fields_form" in saved:
             saved["custom_fields"] = saved["custom_fields_form"]
-
         return {**default_settings, **saved}
     except Exception as e:
         print(f"⚠️ load_settings error: {e}")
@@ -85,13 +83,13 @@ def update_sheet_headers_for_alb(sheet, settings):
 ### 教室登録シートのヘッダー更新
 def update_sheet_headers_for_classroom(sheet, settings):
     headers = [
-    settings.get("form_label_classroom_name", "教室名/イベント名"),
-    settings.get("form_label_classroom_location", "場所"),
-    settings.get("form_label_classroom_date", "募集日時"),
-    settings.get("form_label_classroom_experience", "希望する経験（複数選択可"),
-    settings.get("form_label_classroom_handslevel", "補助レベル（複数選択可）"),
-    settings.get("form_label_classroom_notes", "その他ご要望・自由記述"),
-]
+        settings.get("form_label_classroom_name", "教室名/イベント名"),
+        settings.get("form_label_classroom_location", "場所"),
+        settings.get("form_label_classroom_date", "募集日時"),
+        settings.get("form_label_classroom_experience", "希望する経験（複数選択可"),
+        settings.get("form_label_classroom_handslevel", "補助レベル（複数選択可）"),
+        settings.get("form_label_classroom_notes", "その他ご要望・自由記述"),
+    ]
     for field in settings.get("custom_fields_classroom", []):
         headers.append(field.get("label", ""))
     headers.append("user_id")
@@ -111,14 +109,34 @@ def find_matching_alb(sheet, area, experience_required, datetime_str):
             matched.append(row.get("user_id"))
     return matched
 
-### user_id管理
-def add_user_with_name_if_new(user_id, name):
-    sheet = get_sheet("ユーザー一覧シート")
-    existing = sheet.get_all_values()[1:]
-    existing_ids = [row[0] for row in existing]
+### user_idと名前のマッピングを追加
+def add_user_id_mapping_if_new(webhook_id, name):
+    sheet = get_sheet("ユーザーIDマップ")
+    all_rows = sheet.get_all_values()[1:]
+    existing_ids = [row[1] for row in all_rows]
 
-    if user_id not in existing_ids:
-        sheet.append_row([user_id, name])
-        print(f"📝 新規登録: {user_id} / {name}")
+    if webhook_id not in existing_ids:
+        today = datetime.now().strftime("%Y-%m-%d")
+        sheet.append_row([name, webhook_id, "", "", today])
+        print(f"📝 IDマッピング新規登録: {name} / {webhook_id}")
     else:
-        print(f"✅ 登録済: {user_id}")
+        print(f"✅ 既に登録済: {webhook_id}")
+
+### LIFF IDからWebhook IDを逆引き
+def get_webhook_id_from_liff_id(liff_id):
+    sheet = get_sheet("ユーザーIDマップ")
+    all_rows = sheet.get_all_values()[1:]
+    for row in all_rows:
+        if row[2] == liff_id:
+            return row[1]
+    return None
+
+### Webhook IDに基づき生年月日を更新
+def update_birthday_if_exists(webhook_id, birthday_str):
+    sheet = get_sheet("ユーザーIDマップ")
+    records = sheet.get_all_values()
+    for idx, row in enumerate(records[1:], start=2):
+        if row[1] == webhook_id:
+            sheet.update_cell(idx, 4, birthday_str)  # 生年月日は4列目
+            return True
+    return False

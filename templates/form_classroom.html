@@ -130,5 +130,29 @@
     </button>
   </form>
   </form>
+  <script>
+  async function checkAlbRegistered(userId) {
+    try {
+      const response = await fetch(`/check_alb_registered?user_id=${userId}`);
+      const data = await response.json();
+      return data.registered;
+    } catch (error) {
+      console.error("チェックに失敗しました:", error);
+      return false;
+    }
+  }
+
+  document.querySelector("form").addEventListener("submit", async function (event) {
+    const userIdInput = document.getElementById("user_id");
+    const userId = userIdInput.value;
+
+    const isRegistered = await checkAlbRegistered(userId);
+    if (!isRegistered) {
+      alert("先にアルバイト登録が必要です。アルバイト登録フォームから先に登録してください。");
+      event.preventDefault(); // フォーム送信中止
+    }
+  });
+</script>
+
 </body>
 </html>

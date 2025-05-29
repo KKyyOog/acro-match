@@ -2,6 +2,7 @@ from flask import Blueprint, request, render_template
 from utils.sheets import get_sheet, load_settings, find_matching_alb
 from utils.notify import send_line_message
 from utils.liff import get_liff_id
+from flask import jsonify
 
 classroom_bp = Blueprint('classroom', __name__)
 
@@ -49,6 +50,15 @@ def submit():
         handslevel_str = ", ".join(handslevel_list)
 
         notes = request.form.get("notes", "")
+        
+        # user_idの取得とアルバイト登録済みかどうか確認
+        user_id = request.form.get("user_id", "")
+        alb_sheet = get_sheet("アルバイト登録シート")
+        registered_albs = [row[-1] for row in alb_sheet.get_all_values()[1:]]
+
+        if user_id not in registered_albs:
+            return "⚠️ 先にアルバイト登録が必要です。", 400
+
 
         # 📋 書き込む行の初期データ
         row = [
@@ -114,3 +124,10 @@ def notify_interest():
     except Exception as e:
         print("通知処理エラー:", e)
         return "Internal Server Error", 500
+
+@classroom_bp.route("/check_alb_registered")
+def check_alb_registered():
+    user_id = request.args.get("user_id", "")
+    alb_sheet = get_sheet("アルバイト登録シート")
+    registered_albs = [row[-1] for row in alb_sheet.get_all_values()[1:]]
+    return jsonify({"registered": user_id in registered_albs})
