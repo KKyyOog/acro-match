@@ -46,14 +46,14 @@
       try {
         await liff.init({ liffId: LIFF_ID });
 
-        // 未ログインならログインページにリダイレクト
         if (!liff.isLoggedIn()) {
           liff.login();
-          return; // ←ここで中断しないとエラーになる
+          return;
         }
 
         const profile = await liff.getProfile();
         document.getElementById("user_id").value = profile.userId;
+        document.getElementById("submitBtn").disabled = false;
 
       } catch (error) {
         console.error("LIFF initialization failed:", error);
@@ -74,36 +74,34 @@
     <label for="name">{{ settings.form_label_alb_name | default("ニックネーム") }}</label>
     <input type="text" name="name" id="name" required>
 
-   <!-- 希望する経験 -->
-<section>
-  <label for="experience">{{ settings.form_label_alb_experience | default("経験（複数選択可）") }}</label>
-  <select name="experience" id="experience" multiple size="5">
-    <option value="体操">体操</option>
-    <option value="パルクール">パルクール</option>
-    <option value="トリッキング">トリッキング</option>
-    <option value="チアリーディング">チアリーディング</option>
-    <option value="ダンス">ダンス</option>
-  </select>
-</section>
+    <section>
+      <label for="experience">{{ settings.form_label_alb_experience | default("経験（複数選択可）") }}</label>
+      <select name="experience" id="experience" multiple size="5">
+        <option value="体操">体操</option>
+        <option value="パルクール">パルクール</option>
+        <option value="トリッキング">トリッキング</option>
+        <option value="チアリーディング">チアリーディング</option>
+        <option value="ダンス">ダンス</option>
+      </select>
+    </section>
 
-<!-- 補助レベル -->
-<section>
-  <label for="handslevel">{{ settings.form_label_alb_handslevel | default("補助レベル（複数選択可）") }}</label>
-  <select name="handslevel" id="handslevel" multiple size="5">
-    <option value="経験なし">経験なし</option>
-    <option value="おとな">おとな</option>
-    <option value="学生">学生</option>
-    <option value="こども">こども</option>
-    <option value="バク転">バク転</option>
-    <option value="バク宙">バク宙</option>
-    <option value="ロンバク">ロンバク</option>
-    <option value="ロン宙">ロン宙</option>
-    <option value="ひねり">ひねり</option>
-    <option value="前宙">前宙</option>
-    <option value="転回">転回</option>
-    <option value="側宙">側宙</option>
-  </select>
-</section>
+    <section>
+      <label for="handslevel">{{ settings.form_label_alb_handslevel | default("補助レベル（複数選択可）") }}</label>
+      <select name="handslevel" id="handslevel" multiple size="5">
+        <option value="経験なし">経験なし</option>
+        <option value="おとな">おとな</option>
+        <option value="学生">学生</option>
+        <option value="こども">こども</option>
+        <option value="バク転">バク転</option>
+        <option value="バク宙">バク宙</option>
+        <option value="ロンバク">ロンバク</option>
+        <option value="ロン宙">ロン宙</option>
+        <option value="ひねり">ひねり</option>
+        <option value="前宙">前宙</option>
+        <option value="転回">転回</option>
+        <option value="側宙">側宙</option>
+      </select>
+    </section>
 
     <label for="area">{{ settings.form_label_area | default("希望エリア") }}</label>
     <input type="text" name="area" id="area" required>
@@ -119,7 +117,17 @@
       <input type="text" name="{{ field.name }}" id="{{ field.name }}">
     {% endfor %}
 
-    <button type="submit" style="background: {{ settings.button_color | default('#06c755') }};">送信</button>
+    <button type="submit" id="submitBtn" disabled style="background: {{ settings.button_color | default('#06c755') }};">送信</button>
   </form>
+
+  <script>
+    document.querySelector("form").addEventListener("submit", function (e) {
+      const userId = document.getElementById("user_id").value;
+      if (!userId) {
+        alert("LINEログインが完了していません。少し待ってからもう一度お試しください。");
+        e.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>
