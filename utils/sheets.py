@@ -10,25 +10,19 @@ load_dotenv()
 ### 設定ファイルの読み書き
 def load_settings():
     default_settings = {
-        # アルバイトフォーム用
         "title": "アルバイト登録",
         "button_color": "#00b900",
         "form_label_name": "ニックネーム",
         "form_label_area": "希望エリア",
         "form_label_available": "稼働可能日・時間",
         "form_label_alb_experience": "経験",
-
-        # 教室フォーム用
         "classroom_title": "教室登録",
-        "button_color": "#00b900",
         "form_label_classroom_name": "教室名",
-        "form_label_classroom_location": "場所", 
+        "form_label_classroom_location": "場所",
         "form_label_classroom_date": "募集日時",
         "form_label_classroom_experience": "希望する経験",
         "form_label_classroom_handslevel": "補助レベル",
         "form_label_classroom_notes": "その他ご要望・自由記述",
-
-        # カスタム項目
         "custom_fields": [],
         "custom_fields_classroom": []
     }
@@ -109,12 +103,11 @@ def find_matching_alb(sheet, area, experience_required, datetime_str):
             matched.append(row.get("user_id"))
     return matched
 
-### user_idと名前のマッピングを追加
+### Webhook ID と名前のマッピングを追加
 def add_user_id_mapping_if_new(webhook_id, name):
     sheet = get_sheet("ユーザーIDマップ")
     all_rows = sheet.get_all_values()[1:]
     existing_ids = [row[1] for row in all_rows]
-
     if webhook_id not in existing_ids:
         today = datetime.now().strftime("%Y-%m-%d")
         sheet.append_row([name, webhook_id, "", "", today])
@@ -122,7 +115,7 @@ def add_user_id_mapping_if_new(webhook_id, name):
     else:
         print(f"✅ 既に登録済: {webhook_id}")
 
-### LIFF IDからWebhook IDを逆引き
+### LIFF ID から Webhook ID を取得
 def get_webhook_id_from_liff_id(liff_id):
     sheet = get_sheet("ユーザーIDマップ")
     all_rows = sheet.get_all_values()[1:]
@@ -131,12 +124,12 @@ def get_webhook_id_from_liff_id(liff_id):
             return row[1]
     return None
 
-### Webhook IDに基づき生年月日を更新
+### 生年月日を更新
 def update_birthday_if_exists(webhook_id, birthday_str):
     sheet = get_sheet("ユーザーIDマップ")
     records = sheet.get_all_values()
     for idx, row in enumerate(records[1:], start=2):
         if row[1] == webhook_id:
-            sheet.update_cell(idx, 4, birthday_str)  # 生年月日は4列目
+            sheet.update_cell(idx, 4, birthday_str)
             return True
     return False
