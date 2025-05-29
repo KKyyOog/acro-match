@@ -21,6 +21,12 @@ def submit_alb():
         liff_user_id = request.form.get("user_id", "")
         true_user_id = get_webhook_id_from_liff_id(liff_user_id) or liff_user_id
 
+        # ✅ インデント修正
+        if not true_user_id:
+            true_user_id = liff_user_id
+        else:
+            true_user_id = str(true_user_id)
+
         # ヘッダーを更新
         sheet.delete_rows(1)
         headers = [
@@ -52,3 +58,4 @@ def submit_alb():
     except Exception as e:
         print(f"submit_alb エラー: {e}")
         return "Internal Server Error", 500
+
