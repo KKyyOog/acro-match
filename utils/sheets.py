@@ -48,7 +48,14 @@ def get_sheet(sheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
     client = gspread.authorize(creds)
-    return client.open(sheet_name).sheet1
+
+    spreadsheet_id = os.getenv("SPREADSHEET_ID")  # .env に追加する
+    if not spreadsheet_id:
+        raise ValueError("SPREADSHEET_ID is not set in .env")
+
+    spreadsheet = client.open_by_key(spreadsheet_id)
+    return spreadsheet.worksheet(sheet_name)  # タブの名前（ユーザーIDマップなど）
+
 
 ### LIFF ID取得
 def get_liff_id(context="default"):
