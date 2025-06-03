@@ -55,9 +55,13 @@ def get_google_credentials():
     credentials_json = os.getenv("GOOGLE_CREDENTIALS")
     if not credentials_json:
         raise ValueError("GOOGLE_CREDENTIALS environment variable not set.")
-    credentials_dict = json.loads(credentials_json)
-    return Credentials.from_service_account_info(credentials_dict)
 
+    credentials_dict = json.loads(credentials_json)
+
+    scopes = ["https://www.googleapis.com/auth/spreadsheets",  # ← これが重要
+              "https://www.googleapis.com/auth/drive"]
+
+    return Credentials.from_service_account_info(credentials_dict, scopes=scopes)
 ### LIFF ID取得
 def get_liff_id(context="default"):
     return {
