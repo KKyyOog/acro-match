@@ -47,10 +47,8 @@ def save_settings(data):
 def get_sheet(sheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-    raw_json = os.environ["GOOGLE_CREDENTIALS"]
-    # ← \n を実際の改行に戻す
-    fixed_json = raw_json.replace('\\n', '\n')
-    credentials_data = json.loads(fixed_json)
+    # ✅ 修正：replace はやらない
+    credentials_data = json.loads(os.environ["GOOGLE_CREDENTIALS"])  # ← そのまま読み込む！
 
     creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_data, scope)
     client = gspread.authorize(creds)
