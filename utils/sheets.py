@@ -45,10 +45,15 @@ def save_settings(data):
 
 ### Google Sheets アクセス
 def get_sheet(sheet_name):
+    import os, json
+    from oauth2client.service_account import ServiceAccountCredentials
+
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-    # ✅ 修正：replace はやらない
-    credentials_data = json.loads(os.environ["GOOGLE_CREDENTIALS"])  # ← そのまま読み込む！
+    # 環境変数からJSONを取得して \\n を本物の改行に
+    raw_json = os.environ["GOOGLE_CREDENTIALS"]
+    fixed_json = raw_json.replace("\\n", "\n")  # ← ここ重要
+    credentials_data = json.loads(fixed_json)
 
     creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_data, scope)
     client = gspread.authorize(creds)
