@@ -54,6 +54,9 @@ def callback():
                     # 名前として処理
                     add_user_id_mapping_if_new(webhook_id=user_id, name=user_message)
                     send_line_message(user_id, f"{user_message} さん、登録ありがとうございます！")
+
+        return "OK", 200
+ 
     
     except Exception as e:
         import traceback
