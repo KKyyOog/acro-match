@@ -62,6 +62,7 @@ def get_google_credentials():
               "https://www.googleapis.com/auth/drive"]
 
     return Credentials.from_service_account_info(credentials_dict, scopes=scopes)
+
 ### LIFF ID取得
 def get_liff_id(context="default"):
     return {
