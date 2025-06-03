@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
 load_dotenv()
 
@@ -45,23 +46,17 @@ def save_settings(data):
 
 ### Google Sheets アクセス
 def get_sheet(sheet_name):
-    import os, json
-    from oauth2client.service_account import ServiceAccountCredentials
-
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-
-    # 環境変数からJSONを取得して \\n を本物の改行に
-    raw_json = os.environ["GOOGLE_CREDENTIALS"]
-    #fixed_json = raw_json.replace("\\n", "\n")  # ← ここ重要
-    #credentials_data = json.loads(fixed_json)
-    credentials_data = json.loads(raw_json)
-
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_data, scope)
+    creds = get_google_credentials()
     client = gspread.authorize(creds)
-
-    spreadsheet_id = os.getenv("SPREADSHEET_ID")
-    spreadsheet = client.open_by_key(spreadsheet_id)
+    spreadsheet = client.open_by_key(os.getenv("SPREADSHEET_ID"))
     return spreadsheet.worksheet(sheet_name)
+
+def get_google_credentials():
+    credentials_json = os.getenv("GOOGLE_CREDENTIALS")
+    if not credentials_json:
+        raise ValueError("GOOGLE_CREDENTIALS environment variable not set.")
+    credentials_dict = json.loads(credentials_json)
+    return Credentials.from_service_account_info(credentials_dict)
 
 ### LIFF ID取得
 def get_liff_id(context="default"):
