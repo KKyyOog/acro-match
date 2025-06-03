@@ -46,16 +46,14 @@ def save_settings(data):
 ### Google Sheets アクセス
 def get_sheet(sheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+
+    credentials_data = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_data, scope)
     client = gspread.authorize(creds)
 
-    spreadsheet_id = os.getenv("SPREADSHEET_ID")  # .env に追加する
-    if not spreadsheet_id:
-        raise ValueError("SPREADSHEET_ID is not set in .env")
-
+    spreadsheet_id = os.getenv("SPREADSHEET_ID")
     spreadsheet = client.open_by_key(spreadsheet_id)
-    return spreadsheet.worksheet(sheet_name)  # タブの名前（ユーザーIDマップなど）
-
+    return spreadsheet.worksheet(sheet_name)
 
 ### LIFF ID取得
 def get_liff_id(context="default"):
