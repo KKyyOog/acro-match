@@ -52,8 +52,9 @@ def get_sheet(sheet_name):
 
     # 環境変数からJSONを取得して \\n を本物の改行に
     raw_json = os.environ["GOOGLE_CREDENTIALS"]
-    fixed_json = raw_json.replace("\\n", "\n")  # ← ここ重要
-    credentials_data = json.loads(fixed_json)
+    #fixed_json = raw_json.replace("\\n", "\n")  # ← ここ重要
+    #credentials_data = json.loads(fixed_json)
+    credentials_data = json.loads(raw_json)
 
     creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_data, scope)
     client = gspread.authorize(creds)
