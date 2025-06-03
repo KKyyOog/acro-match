@@ -2,7 +2,7 @@ from flask import Blueprint, request, render_template
 from utils.sheets import get_sheet, load_settings, find_matching_alb
 from utils.notify import send_line_message
 from utils.liff import get_liff_id
-from flask import jsonify
+from flask import jsonify, redirect, url_for
 
 classroom_bp = Blueprint('classroom', __name__)
 
@@ -57,7 +57,7 @@ def submit():
         registered_albs = [row[-1] for row in alb_sheet.get_all_values()[1:]]
 
         if user_id not in registered_albs:
-            return "⚠️ 先にアルバイト登録が必要です。", 400
+            return redirect(url_for('alb.register_alb', error="need_alb"))
 
 
         # 📋 書き込む行の初期データ

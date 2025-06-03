@@ -146,3 +146,4 @@ def update_birthday_if_exists(webhook_id, birthday_str):
             sheet.update_cell(idx, 4, birthday_str)
             return True
     return False
+

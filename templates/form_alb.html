@@ -119,6 +119,12 @@
 
     <button type="submit" id="submitBtn" disabled style="background: {{ settings.button_color | default('#06c755') }};">送信</button>
   </form>
+  {% if error_msg == 'need_alb' %}
+    <p style="color: red; text-align: center; font-weight: bold;">
+      先にアルバイト登録が必要です。こちらのフォームからご登録ください。
+    </p>
+  {% endif %}
+
 
   <script>
     document.querySelector("form").addEventListener("submit", function (e) {

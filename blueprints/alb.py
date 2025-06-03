@@ -9,7 +9,8 @@ alb_bp = Blueprint('alb', __name__)
 def register_alb():
     settings = load_settings()
     liff_id = get_liff_id("alb")
-    return render_template("form_alb.html", settings=settings, liff_id=liff_id)
+    error_msg = request.args.get("error")
+    return render_template("form_alb.html", settings=settings, liff_id=liff_id, error_msg=error_msg)
 
 @alb_bp.route("/submit_alb", methods=["POST"])
 def submit_alb():
