@@ -4,6 +4,7 @@ from blueprints.alb import alb_bp
 from blueprints.classroom import classroom_bp
 from blueprints.admin import admin_bp
 from blueprints.callback import callback_bp  # ← Blueprintの読み込み
+from blueprints.link import link_bp
 
 import os
 
@@ -17,6 +18,7 @@ app.register_blueprint(alb_bp)
 app.register_blueprint(classroom_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(callback_bp)
+app.register_blueprint(link_bp)
 
 # ✅ callback_bp だけCSRF保護を除外
 csrf.exempt(callback_bp)  # ← ここが重要！

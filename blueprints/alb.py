@@ -1,6 +1,10 @@
-# 修正後の alb.py
 from flask import Blueprint, request, render_template
-from utils.sheets import get_sheet, load_settings, get_webhook_id_from_liff_id
+from utils.sheets import (
+    get_sheet,
+    load_settings,
+    get_webhook_id_from_liff_id,
+    update_liff_id_in_user_map  # ✅ 追加
+)
 from utils.liff import get_liff_id
 
 alb_bp = Blueprint('alb', __name__)
@@ -22,7 +26,6 @@ def submit_alb():
         liff_user_id = request.form.get("user_id", "")
         true_user_id = get_webhook_id_from_liff_id(liff_user_id) or liff_user_id
 
-        # ✅ インデント修正
         if not true_user_id:
             true_user_id = liff_user_id
         else:
@@ -44,6 +47,7 @@ def submit_alb():
 
         # フォームデータ取得
         name = request.form.get("name", "")
+        birthday4 = request.form.get("birthday4", "")  # ✅ 追加
         experience_list = request.form.getlist("experience")
         experience_str = ", ".join(experience_list)
         area = request.form.get("area", "")
@@ -52,6 +56,10 @@ def submit_alb():
 
         custom_values = [request.form.get(field.get("name", ""), "") for field in settings.get("custom_fields", [])]
 
+        # ✅ LIFF ID と Webhook ID のマッピングを更新（ユーザーIDマップ）
+        update_liff_id_in_user_map(name, birthday4, liff_user_id)
+
+        # スプレッドシートに登録
         row = [name, experience_str, area, available, reachtime] + custom_values + [true_user_id]
         sheet.append_row(row)
 
@@ -59,4 +67,3 @@ def submit_alb():
     except Exception as e:
         print(f"submit_alb エラー: {e}")
         return "Internal Server Error", 500
-

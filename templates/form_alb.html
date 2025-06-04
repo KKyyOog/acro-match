@@ -65,6 +65,11 @@
   </script>
 </head>
 <body>
+  {% if error_msg == 'need_alb' %}
+    <p style="color: red; text-align: center; font-weight: bold;">
+      先にアルバイト登録が必要です。こちらのフォームからご登録ください。
+    </p>
+  {% endif %}
   <form action="/submit_alb" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 style="text-align:center;">{{ settings.title | default("フォーム") }}</h2>
@@ -73,6 +78,10 @@
 
     <label for="name">{{ settings.form_label_alb_name | default("ニックネーム") }}</label>
     <input type="text" name="name" id="name" required>
+
+    <!-- ✅ 生年月日4桁を追加 -->
+    <label for="birthday4">生年月日（月日4桁・例：0602）</label>
+    <input type="text" name="birthday4" id="birthday4" pattern="\d{4}" placeholder="0602" required>
 
     <section>
       <label for="experience">{{ settings.form_label_alb_experience | default("経験（複数選択可）") }}</label>
@@ -119,21 +128,43 @@
 
     <button type="submit" id="submitBtn" disabled style="background: {{ settings.button_color | default('#06c755') }};">送信</button>
   </form>
-  {% if error_msg == 'need_alb' %}
-    <p style="color: red; text-align: center; font-weight: bold;">
-      先にアルバイト登録が必要です。こちらのフォームからご登録ください。
-    </p>
-  {% endif %}
 
-
+  <!-- ✅ LIFF ID連携用のPOST処理 -->
   <script>
-    document.querySelector("form").addEventListener("submit", function (e) {
-      const userId = document.getElementById("user_id").value;
-      if (!userId) {
-        alert("LINEログインが完了していません。少し待ってからもう一度お試しください。");
-        e.preventDefault();
+    async function linkLiffIdBeforeSubmit(event) {
+      const nickname = document.getElementById("name").value;
+      const birthday4 = document.getElementById("birthday4").value;
+      const liffId = document.getElementById("user_id").value;
+
+      if (!nickname || !birthday4 || !liffId) {
+        alert("ニックネーム、生年月日4桁、LINEログインが必要です。");
+        event.preventDefault();
+        return;
       }
-    });
+
+      try {
+        const response = await fetch("/link_liff_id", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ nickname, birthday4, liff_id: liffId })
+        });
+
+        const result = await response.text();
+        if (!response.ok) {
+          alert("LIFF ID の連携に失敗しました：" + result);
+          event.preventDefault();
+        }
+
+      } catch (error) {
+        console.error("エラー:", error);
+        alert("サーバーとの通信に失敗しました");
+        event.preventDefault();
+      }
+    }
+
+    document.querySelector("form").addEventListener("submit", linkLiffIdBeforeSubmit);
   </script>
 </body>
 </html>

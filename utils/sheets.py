@@ -128,14 +128,30 @@ def add_user_id_mapping_if_new(webhook_id, name):
     else:
         print(f"✅ 既に登録済: {webhook_id}")
 
-### LIFF ID から Webhook ID を取得
-def get_webhook_id_from_liff_id(liff_id):
+### ニックネームと生年月日で Webhook ID を照合
+def update_liff_id_in_user_map(nickname, birthday_last4, new_liff_id):
     sheet = get_sheet("ユーザーIDマップ")
-    all_rows = sheet.get_all_values()[1:]
-    for row in all_rows:
-        if row[2] == liff_id:
-            return row[1]
-    return None
+    records = sheet.get_all_records()
+
+    for i, row in enumerate(records):
+        name_match = row.get("ニックネーム") == nickname
+
+        # 生年月日の下4桁を抽出（例: 2005年06月02日 → 0602）
+        birthday = row.get("生年月日", "")
+        bday_digits = ''.join(filter(str.isdigit, birthday))  # 20050602
+        bday_last4 = bday_digits[-4:] if len(bday_digits) >= 4 else ""
+
+        bday_match = bday_last4 == birthday_last4
+
+        if name_match and bday_match:
+            # C列（3番目）が LIFF ID 列 → 2行目以降なので i+2
+            sheet.update_cell(i + 2, 3, new_liff_id)
+            print(f"✅ LIFF ID を更新: {nickname} / {birthday_last4}")
+            return True
+
+    print("❌ 一致するユーザーが見つかりません")
+    return False
+
 
 ### 生年月日を更新
 def update_birthday_if_exists(webhook_id, birthday_str):
