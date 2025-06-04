@@ -2,7 +2,6 @@ from flask import Blueprint, request, render_template
 from utils.sheets import (
     get_sheet,
     load_settings,
-    get_webhook_id_from_liff_id,
     update_liff_id_in_user_map  # ✅ 追加
 )
 from utils.liff import get_liff_id
@@ -24,12 +23,7 @@ def submit_alb():
 
         # LIFF ID -> Webhook ID 変換
         liff_user_id = request.form.get("user_id", "")
-        true_user_id = get_webhook_id_from_liff_id(liff_user_id) or liff_user_id
-
-        if not true_user_id:
-            true_user_id = liff_user_id
-        else:
-            true_user_id = str(true_user_id)
+        true_user_id = liff_user_id
 
         # ヘッダーを更新
         sheet.delete_rows(1)
