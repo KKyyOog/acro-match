@@ -54,19 +54,23 @@
     }
 
     async function submitForm(liffId) {
+  console.log("📤 送信する liffId:", liffId);  // ← 追加
   if (!window.userId) {
     alert("ユーザー情報の取得に失敗しました");
     return;
   }
 
+  const payload = {
+    liff_id: liffId,
+    user_name: window.userId
+  };
+  console.log("📤 送信ペイロード:", payload);  // ← 追加
+
   try {
     await fetch("/interest", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        liff_id: liffId,
-        user_name: window.userId  // 任意ならそのままでもOK
-      })
+      body: JSON.stringify(payload)
     });
     alert("送信しました！");
   } catch (err) {
