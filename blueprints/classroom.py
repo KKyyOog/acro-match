@@ -101,13 +101,14 @@ def notify_interest():
     try:
         data = request.get_json(force=True)
         print("🚩 classroom側 /interest に到達")
-        print("📥 受信データ（型）:", type(data))
-        print("📥 受信データ（中身）:", data)
+        print("📥 request.headers:", dict(request.headers))
+        print("📥 request body（raw）:", request.get_data())
+        print("📥 request.get_json():", data)
 
         if not data or "row_index" not in data or "user_id" not in data:
-            print("❌ 必須項目が欠落")
+            print("❌ 必須項目が欠落しています")
             return "row_index または user_id がありません", 400
-        
+  
         row_index = int(data["row_index"])
         user_id = data.get("user_id")  # 押した人（アルバイト）のuser_id
 
