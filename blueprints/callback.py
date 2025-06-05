@@ -29,7 +29,7 @@ def receive_callback():
 
             if not user_id:
                 continue
-
+            
             if event_type == "follow":
                 send_line_message(user_id, "友だち追加ありがとうございます！\nまずお名前を送ってください。その後、生年月日（〇〇〇〇年〇〇月〇〇日）を送ってください。")
 
@@ -57,7 +57,10 @@ def receive_callback():
                 else:
                     # 名前として処理
                     register_user_info(user_message, "", user_id)
-                    send_line_message(user_id, f"{user_message} さん、登録ありがとうございます！")
+                    try:
+                        send_line_message(user_id, f"{user_message} さん、登録ありがとうございます！")
+                    except Exception as e:
+                        print("❌ メッセージ送信失敗:", e)
 
         return "OK", 200
 
