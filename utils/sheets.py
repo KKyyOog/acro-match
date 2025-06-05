@@ -1,58 +1,84 @@
-# utils/sheets.py
-
-import gspread
-import json
 import os
-from datetime import datetime
-from dotenv import load_dotenv
-from google.oauth2.service_account import Credentials
+import json
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from utils.logging_util import log_exception
 
-load_dotenv()
+SCOPES = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-def get_google_credentials():
+# Render用: GOOGLE_CREDENTIALS にJSONを直接環境変数として渡す
+cred_json = os.getenv("GOOGLE_CREDENTIALS")
+if not cred_json:
+    raise ValueError("GOOGLE_CREDENTIALS not set")
+
+try:
+    credentials = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(cred_json), SCOPES)
+    gc = gspread.authorize(credentials)
+except Exception as e:
+    log_exception(e, context="Google認証")
+    raise
+
+def get_sheet(sheet_name):
     try:
-        credentials_json = os.getenv("GOOGLE_CREDENTIALS")
-        credentials_path = os.getenv("GOOGLE_CREDENTIAL_PATH")
-
-        if credentials_json:
-            info = json.loads(credentials_json)
-        elif credentials_path and os.path.exists(credentials_path):
-            with open(credentials_path, "r", encoding="utf-8") as f:
-                info = json.load(f)
-        else:
-            raise ValueError("Google認証情報が見つかりません")
-
-        scopes = [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive"
-        ]
-        return Credentials.from_service_account_info(info, scopes=scopes)
-    except Exception as e:
-        log_exception(e, context="Google認証取得")
-        raise
-
-def get_sheet(sheet_name: str):
-    try:
-        sheet_id = os.getenv("SPREADSHEET_ID")
-        if not sheet_id:
-            raise ValueError("SPREADSHEET_ID が環境変数に設定されていません。")
-        creds = get_google_credentials()
-        client = gspread.authorize(creds)
-        spreadsheet = client.open_by_key(sheet_id)
+        spreadsheet = gc.open_by_key(os.getenv("SPREADSHEET_ID"))
         return spreadsheet.worksheet(sheet_name)
     except Exception as e:
-        log_exception(e, context=f"シート取得: {sheet_name}")
+        log_exception(e, context=f"シート取得失敗: {sheet_name}")
         raise
 
-# 以下の関数はそのまま、またはエラーハンドリング追加して移植
-# - load_settings
-# - add_user_id_mapping_if_new
-# - update_birthday_if_exists
-# - update_liff_id_in_user_map
-# - update_sheet_headers_for_alb
-# - update_sheet_headers_for_classroom
-# - get_webhook_id_from_liff_id
-# - save_settings
+def add_user_id_mapping_if_new(webhook_id: str, name: str):
+    try:
+        sheet = get_sheet("ユーザー対応表")
+        ids = [row[0] for row in sheet.get_all_values()[1:]]
+        if webhook_id not in ids:
+            sheet.append_row([webhook_id, name])
+    except Exception as e:
+        log_exception(e, context="ユーザー追加失敗")
 
-# 変更点は主に認証取得の柔軟性と log_exception の徹底活用
+def update_birthday_if_exists(webhook_id: str, birthday: str) -> bool:
+    try:
+        sheet = get_sheet("ユーザー対応表")
+        records = sheet.get_all_values()
+        for idx, row in enumerate(records):
+            if row and row[0] == webhook_id:
+                sheet.update_cell(idx + 1, 3, birthday)
+                return True
+        return False
+    except Exception as e:
+        log_exception(e, context="誕生日更新失敗")
+        return False
+
+def update_liff_id_in_user_map(name: str, birthday4: str, liff_id: str) -> bool:
+    try:
+        sheet = get_sheet("ユーザー対応表")
+        records = sheet.get_all_values()
+        for idx, row in enumerate(records):
+            if len(row) >= 3 and row[1] == name and row[2][-4:] == birthday4:
+                if len(row) < 4:
+                    row += [""] * (4 - len(row))
+                sheet.update_cell(idx + 1, 4, liff_id)
+                return True
+        return False
+    except Exception as e:
+        log_exception(e, context="LIFF ID 更新失敗")
+        return False
+
+def update_sheet_headers_for_alb(sheet, settings):
+    headers = [
+        "名前", "生年月日(下4桁)", "経験", "補助レベル", "地域", "出勤可能日", "到着時間"
+    ]
+    for field in settings.get("custom_fields", []):
+        headers.append(field.get("label", ""))
+    headers.append("LINE ID")
+    sheet.resize(rows=1)
+    sheet.insert_row(headers, index=1)
+
+def update_sheet_headers_for_classroom(sheet, settings):
+    headers = [
+        "教室名", "場所", "日時", "希望する経験", "補助レベル", "備考"
+    ]
+    for field in settings.get("custom_fields_classroom", []):
+        headers.append(field.get("label", ""))
+    headers.append("LINE ID")
+    sheet.resize(rows=1)
+    sheet.insert_row(headers, index=1)
