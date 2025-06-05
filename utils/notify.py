@@ -12,32 +12,30 @@ LINE_API_URL = "https://api.line.me/v2/bot/message/push"
 LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN")
 
 def send_line_message(user_id, message_text):
-    """
-    LINEメッセージ送信処理。
-    成功時: (True, None)
-    失敗時: (False, エラーメッセージ)
-    """
+    access_token = os.getenv("LINE_ACCESS_TOKEN")
+    print("🪪 LINE_ACCESS_TOKEN:", access_token is not None)
+
+    url = "https://api.line.me/v2/bot/message/push"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
+        "Authorization": f"Bearer {access_token}"
     }
     payload = {
         "to": user_id,
         "messages": [{"type": "text", "text": message_text}]
     }
-    print("送信ペイロード:", payload)
+
     try:
-        response = requests.post(LINE_API_URL, headers=headers, json=payload)
+        response = requests.post(url, headers=headers, json=payload)
+        print("📨 LINE送信ステータス:", response.status_code)
+        print("📨 レスポンス内容:", response.text)
 
         if response.status_code != 200:
-            error_info = f"LINE通知失敗: {response.status_code} - {response.text}"
-            print("⚠️", error_info)
-            return False, error_info
-        print("✅ 通知送信成功")
-        return True, None
+            raise Exception(f"LINE送信失敗: {response.status_code} {response.text}")
+
     except Exception as e:
-        log_exception(e, context="LINE通知送信エラー")
-        return False, str(e)
+        print("❌ send_line_message 内で例外:", e)
+
 
 def notify_classroom_of_interest(liff_id, interested_user_name="誰かが"):
     """
