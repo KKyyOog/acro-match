@@ -136,3 +136,15 @@ def get_webhook_id_from_liff_id(liff_id: str) -> str | None:
     except Exception as e:
         log_exception(e, context="LIFF ID → Webhook ID 取得")
         return None
+
+def save_settings(settings: dict):
+    """
+    設定内容をGoogle Sheetsに保存する関数（設定シート名: "設定"）。
+    """
+    try:
+        sheet = get_sheet("設定")
+        sheet.clear()
+        for key, value in settings.items():
+            sheet.append_row([key, value])
+    except Exception as e:
+        log_exception(e, context="save_settings失敗")
