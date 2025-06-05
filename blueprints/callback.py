@@ -7,8 +7,7 @@ from utils.sheets import update_birthday_if_exists
 from utils.notify import send_line_message
 from utils.logging_util import log_exception
 
-callback_bp = Blueprint("callback", __name__, url_prefix="/callback")
-
+callback_bp = Blueprint("callback", __name__)
 user_state = {}  # 例： {user_id: {'step': 'awaiting_birthday', 'name': '山田太郎'}}
 
 @callback_bp.route("/callback", methods=["POST"])
