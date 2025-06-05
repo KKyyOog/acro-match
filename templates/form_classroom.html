@@ -60,6 +60,31 @@
         alert("LINEログインに失敗しました。拡張機能を無効にして再度お試しください。");
       }
     }
+    
+    async function submitForm(rowIndex) {
+  if (!window.userId) {
+    alert("ユーザー情報の取得に失敗しました");
+    return;
+  }
+
+  const payload = {
+    row_index: rowIndex,
+    user_id: window.userId
+  };
+  console.log("📤 送信ペイロード:", payload);
+
+  try {
+    await fetch("/interest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    alert("通知を送りました！");
+  } catch (err) {
+    alert("送信エラー：" + err);
+  }
+}
+
 
     window.onload = initializeLIFF;
   </script>

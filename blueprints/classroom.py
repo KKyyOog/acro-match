@@ -99,12 +99,14 @@ def view_classrooms():
 @classroom_bp.route("/interest", methods=["POST"])
 def notify_interest():
     try:
-        data = request.get_json()
+        data = request.get_json(force=True)
         print("🚩 classroom側 /interest に到達")
-        print("📥 受信データ:", data)  # ← これが超重要
+        print("📥 受信データ（型）:", type(data))
+        print("📥 受信データ（中身）:", data)
 
-        if not data or "row_index" not in data:
-            return "row_index がありません", 400
+        if not data or "row_index" not in data or "user_id" not in data:
+            print("❌ 必須項目が欠落")
+            return "row_index または user_id がありません", 400
         
         row_index = int(data["row_index"])
         user_id = data.get("user_id")  # 押した人（アルバイト）のuser_id

@@ -75,6 +75,7 @@ def get_liff_id(context="default"):
 def update_sheet_headers_for_alb(sheet, settings):
     headers = [
         settings.get("form_label_alb_name", "ニックネーム"),
+        settings.get("form_label_birthday4", "生年月日（月日4桁・例：0602）"),
         settings.get("form_label_alb_experience", "経験（複数選択可）"),
         settings.get("form_label_alb_handslevel", "補助レベル（複数選択可）"),
         settings.get("form_label_area", "希望エリア"),
