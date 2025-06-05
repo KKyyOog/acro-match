@@ -20,7 +20,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 0.8rem;
       margin: 0.6rem 0;
@@ -28,14 +28,14 @@
       border-radius: 8px;
     }
     button {
-          color: white;
-          padding: 1rem;
-          border: none;
-          border-radius: 30px;
-          width: 100%;
-          font-size: 1rem;
-          background: var(--button-color, #06c755);
-        }
+      color: white;
+      padding: 1rem;
+      border: none;
+      border-radius: 30px;
+      width: 100%;
+      font-size: 1rem;
+      background: var(--button-color, #06c755);
+    }
   </style>
 
   <!-- LINE LIFF SDK -->
@@ -60,37 +60,14 @@
         alert("LINEログインに失敗しました。拡張機能を無効にして再度お試しください。");
       }
     }
-    
-    async function submitForm(rowIndex) {
-  if (!window.userId) {
-    alert("ユーザー情報の取得に失敗しました");
-    return;
-  }
-
-  const payload = {
-    row_index: rowIndex,
-    user_id: window.userId
-  };
-  console.log("📤 送信ペイロード:", payload);
-
-  try {
-    await fetch("/interest", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    alert("通知を送りました！");
-  } catch (err) {
-    alert("送信エラー：" + err);
-  }
-}
-
 
     window.onload = initializeLIFF;
   </script>
 </head>
-  <form action="/submit" method="post" style="--button-color: {{ settings.button_color | default('#06c755') }};">
-   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+<body>
+  <form action="/classroom/submit" method="post" style="--button-color: {{ settings.button_color | default('#06c755') }};">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 style="text-align: center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>
 
     <input type="hidden" name="user_id" id="user_id">
@@ -101,61 +78,51 @@
     <label for="location">{{ settings.form_label_classroom_location | default("場所") }}</label>
     <input type="text" name="location" id="location" required>
 
-   <!-- 募集日時 -->
-<section>
-  <label for="date">{{ settings.form_label_classroom_date | default("募集日時") }}</label>
-  <input type="datetime-local" name="date" id="date" required>
-</section>
+    <section>
+      <label for="date">{{ settings.form_label_classroom_date | default("募集日時") }}</label>
+      <input type="datetime-local" name="date" id="date" required>
+    </section>
 
-<!-- 希望する経験 -->
-<section>
-  <label for="experience">{{ settings.form_label_classroom_experience | default("希望する経験（複数選択可）") }}</label>
-  <select name="experience" id="experience" multiple size="5">
-    <option value="体操">体操</option>
-    <option value="パルクール">パルクール</option>
-    <option value="トリッキング">トリッキング</option>
-    <option value="チアリーディング">チアリーディング</option>
-    <option value="ダンス">ダンス</option>
-  </select>
-</section>
+    <section>
+      <label for="experience">{{ settings.form_label_classroom_experience | default("希望する経験（複数選択可）") }}</label>
+      <select name="experience" id="experience" multiple size="5">
+        <option value="体操">体操</option>
+        <option value="パルクール">パルクール</option>
+        <option value="トリッキング">トリッキング</option>
+        <option value="チアリーディング">チアリーディング</option>
+        <option value="ダンス">ダンス</option>
+      </select>
+    </section>
 
-<!-- 補助レベル -->
-<section>
-  <label for="handslevel">{{ settings.form_label_classroom_handslevel | default("補助レベル（複数選択可）") }}</label>
-  <select name="handslevel" id="handslevel" multiple size="5">
-    <option value="未経験歓迎">未経験歓迎</option>
-    <option value="おとな">おとな</option>
-    <option value="学生">学生</option>
-    <option value="こども">こども</option>
-    <option value="バク転">バク転</option>
-    <option value="バク宙">バク宙</option>
-    <option value="ロンバク">ロンバク</option>
-    <option value="ロン宙">ロン宙</option>
-    <option value="ひねり">ひねり</option>
-    <option value="前宙">前宙</option>
-    <option value="転回">転回</option>
-    <option value="側宙">側宙</option>
-  </select>
-</section>
+    <section>
+      <label for="handslevel">{{ settings.form_label_classroom_handslevel | default("補助レベル（複数選択可）") }}</label>
+      <select name="handslevel" id="handslevel" multiple size="5">
+        <option value="未経験歓迎">未経験歓迎</option>
+        <option value="おとな">おとな</option>
+        <option value="学生">学生</option>
+        <option value="こども">こども</option>
+        <option value="バク転">バク転</option>
+        <option value="バク宙">バク宙</option>
+        <option value="ロンバク">ロンバク</option>
+        <option value="ロン宙">ロン宙</option>
+        <option value="ひねり">ひねり</option>
+        <option value="前宙">前宙</option>
+        <option value="転回">転回</option>
+        <option value="側宙">側宙</option>
+      </select>
+    </section>
 
-<!-- その他自由記述 -->
-<section>
-  <label for="notes">{{ settings.form_label_classroom_notes | default("その他ご要望・自由記述") }}</label>
-  <textarea name="notes" id="notes" rows="4" style="width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 8px;"></textarea>
-</section>
+    <section>
+      <label for="notes">{{ settings.form_label_classroom_notes | default("その他ご要望・自由記述") }}</label>
+      <textarea name="notes" id="notes" rows="4"></textarea>
+    </section>
 
-
-    {% for field in settings.custom_fields %}
+    {% for field in settings.custom_fields_classroom or [] %}
       <label for="{{ field.name }}">{{ field.label }}</label>
       <input type="text" name="{{ field.name }}" id="{{ field.name }}">
     {% endfor %}
 
-    <button type="submit">
-      送信
-    </button>
+    <button type="submit">送信</button>
   </form>
-  </form>
-  
-
 </body>
 </html>

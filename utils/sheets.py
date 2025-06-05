@@ -3,10 +3,24 @@ import json
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from oauth2client.service_account import ServiceAccountCredentials
 from google.oauth2.service_account import Credentials
+from utils.logging_util import log_exception  # 任意追加
 
 load_dotenv()
+
+# ✅ 最上部に統一
+def get_sheet(sheet_name: str):
+    sheet_id = os.getenv("SPREADSHEET_ID")
+    if sheet_id is None:
+        raise RuntimeError("❌ SPREADSHEET_ID が環境変数に設定されていません。")
+    creds = get_google_credentials()
+    client = gspread.authorize(creds)
+    spreadsheet = client.open_by_key(sheet_id)
+    return spreadsheet.worksheet(sheet_name)
+
+# ✅ 明示的に役割を分ける
+def get_user_id_map_sheet():
+    return get_sheet("ユーザーIDマップ")
 
 ### 設定ファイルの読み書き
 def load_settings():
@@ -44,13 +58,6 @@ def save_settings(data):
     except Exception as e:
         print(f"⚠️ save_settings error: {e}")
 
-### Google Sheets アクセス
-def get_sheet(sheet_name):
-    creds = get_google_credentials()
-    client = gspread.authorize(creds)
-    spreadsheet = client.open_by_key(os.getenv("SPREADSHEET_ID"))
-    return spreadsheet.worksheet(sheet_name)
-
 def get_google_credentials():
     credentials_json = os.getenv("GOOGLE_CREDENTIALS")
     if not credentials_json:
@@ -87,6 +94,12 @@ def update_sheet_headers_for_alb(sheet, settings):
     headers.append("user_id")
     sheet.delete_rows(1)
     sheet.insert_row(headers, index=1)
+
+# utils/sheets.py に追加
+def update_sheet_headers(sheet, header_labels):
+    sheet.delete_rows(1)
+    sheet.insert_row(header_labels, index=1)
+
 
 ### 教室登録シートのヘッダー更新
 def update_sheet_headers_for_classroom(sheet, settings):
@@ -175,3 +188,4 @@ def get_webhook_id_from_liff_id(liff_id):
         if row[2] == liff_id:  # 3列目がLIFF ID
             return row[1]      # 2列目がWebhook ID
     return None
+

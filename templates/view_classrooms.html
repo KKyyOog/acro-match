@@ -35,6 +35,7 @@
     }
   </style>
 
+  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     const LIFF_ID = "{{ liff_id | safe }}";
@@ -54,27 +55,27 @@
     }
 
     async function submitForm(rowIndex) {
-  if (!window.userId) {
-    alert("ユーザー情報の取得に失敗しました");
-    return;
-  }
+      if (!window.userId) {
+        alert("ユーザー情報の取得に失敗しました");
+        return;
+      }
 
-  const payload = {
-    row_index: rowIndex,           // ✅ 必須
-    user_id: window.userId         // ✅ 必須
-  };
+      const payload = {
+        row_index: rowIndex,
+        user_id: window.userId
+      };
 
-  try {
-    await fetch("/interest", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    alert("通知を送りました！");
-  } catch (err) {
-    alert("送信エラー：" + err);
-  }
-}
+      try {
+        await fetch("/classroom/interest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        alert("通知を送りました！");
+      } catch (err) {
+        alert("送信エラー：" + err);
+      }
+    }
 
     function showNotes(notes) {
       if (notes && notes.trim()) {
@@ -124,7 +125,7 @@
           <td>{{ row[3] }}</td>
           <td>{{ row[4] }}</td>
           <td>
-            <button type="button" onclick="submitForm('{{ row[6] }}')">興味あり</button>
+            <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
           </td>
         </tr>
       {% endfor %}

@@ -34,6 +34,7 @@
       border-radius: 30px;
       width: 100%;
       font-size: 1rem;
+      background: {{ settings.button_color | default('#06c755') }};
     }
   </style>
 
@@ -70,7 +71,8 @@
       先にアルバイト登録が必要です。こちらのフォームからご登録ください。
     </p>
   {% endif %}
-  <form action="/submit_alb" method="post">
+
+  <form action="/alb/submit" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 style="text-align:center;">{{ settings.title | default("フォーム") }}</h2>
 
@@ -79,8 +81,7 @@
     <label for="name">{{ settings.form_label_alb_name | default("ニックネーム") }}</label>
     <input type="text" name="name" id="name" required>
 
-    <!-- ✅ 生年月日4桁を追加 -->
-    <label for="birthday4">{{ settings.form_label_alb_birthday4 | default("生年月日（月日4桁・例：0602）") }}</label>
+    <label for="birthday4">{{ settings.form_label_birthday4 | default("生年月日（月日4桁・例：0602）") }}</label>
     <input type="text" name="birthday4" id="birthday4" pattern="\d{4}" placeholder="0602" required>
 
     <section>
@@ -126,10 +127,9 @@
       <input type="text" name="{{ field.name }}" id="{{ field.name }}">
     {% endfor %}
 
-    <button type="submit" id="submitBtn" disabled style="background: {{ settings.button_color | default('#06c755') }};">送信</button>
+    <button type="submit" id="submitBtn" disabled>送信</button>
   </form>
 
-  <!-- ✅ LIFF ID連携用のPOST処理 -->
   <script>
     async function linkLiffIdBeforeSubmit(event) {
       const nickname = document.getElementById("name").value;
@@ -143,7 +143,7 @@
       }
 
       try {
-        const response = await fetch("/link_liff_id", {
+        const response = await fetch("/link/liff", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
