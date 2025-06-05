@@ -53,29 +53,24 @@
       }
     }
 
-    async function submitForm(liffId) {
-  console.log("📤 送信する liffId:", liffId);  // ← 追加
+    async function submitForm(rowIndex) {
   if (!window.userId) {
     alert("ユーザー情報の取得に失敗しました");
     return;
   }
 
   const payload = {
-    liff_id: liffId,
-    user_name: window.userId
+    row_index: rowIndex,           // ✅ 必須
+    user_id: window.userId         // ✅ 必須
   };
-  console.log("📤 送信ペイロード:", payload);  // ← 追加
 
   try {
-    await fetch("/classroom/interest", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    row_index: rowIndex,
-    user_id: window.userId
-    })
+    await fetch("/interest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
-    alert("送信しました！");
+    alert("通知を送りました！");
   } catch (err) {
     alert("送信エラー：" + err);
   }
