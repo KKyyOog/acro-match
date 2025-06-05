@@ -60,7 +60,7 @@
 </head>
 <body>
   <form action="/classroom/submit" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="user_id" id="user_id" value="">
 
     <h2 style="text-align:center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>

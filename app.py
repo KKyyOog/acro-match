@@ -13,6 +13,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret-key")
 
 csrf = CSRFProtect()
 csrf.init_app(app)
+csrf.exempt(callback_bp)
 
 load_dotenv()
 
