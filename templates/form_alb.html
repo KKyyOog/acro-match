@@ -73,7 +73,7 @@
     <input type="text" name="name" id="name" required aria-required="true">
 
     <label for="birthday4">{{ settings.form_label_birthday4 | default("生年月日（月日4桁・例：0602）") }}</label>
-    <input type="text" name="birthday4" id="birthday4" pattern="\\d{4}" maxlength="4" placeholder="0602" required aria-required="true">
+    <input type="text" name="birthday4" id="birthday4" pattern="\d{4}" maxlength="4" placeholder="0602" required aria-required="true">
 
     <label for="experience">{{ settings.form_label_alb_experience | default("経験（複数選択可）") }}</label>
     <select name="experience[]" id="experience" multiple size="5" aria-multiselectable="true">
