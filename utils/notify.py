@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from utils.sheets import get_webhook_id_from_liff_id
 
 load_dotenv()
 
@@ -24,6 +25,17 @@ def send_line_message(user_id, message_text):
         return False
     print("✅ 通知送信成功")
     return True
+
+
+def notify_classroom_of_interest(liff_id, interested_user_name="誰かが"):
+    webhook_id = get_webhook_id_from_liff_id(liff_id)
+    if webhook_id:
+        message = f"{interested_user_name} あなたの募集に興味を持っています！"
+        return send_line_message(webhook_id, message)
+    else:
+        print("❌ 対応するWebhook IDが見つかりません")
+        return False
+
 
 # テスト用に直接実行される場合
 #if __name__ == "__main__":

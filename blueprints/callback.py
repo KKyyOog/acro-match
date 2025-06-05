@@ -4,6 +4,7 @@ import os
 import sys
 import re
 from utils.sheets import add_user_id_mapping_if_new, update_birthday_if_exists
+from utils.notify import notify_classroom_of_interest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils.notify import send_line_message
@@ -62,3 +63,16 @@ def callback():
         import traceback
         print("❌ Webhook処理エラー:\n", traceback.format_exc())
         return "Error", 500
+
+
+@callback_bp.route("/interest", methods=["POST"])
+def interest():
+    data = request.get_json()
+    liff_id = data.get("liff_id")
+    interested_user_name = data.get("user_name", "誰かが")
+
+    if not liff_id:
+        return "LIFF ID がありません", 400
+
+    success = notify_classroom_of_interest(liff_id, interested_user_name)
+    return ("通知成功", 200) if success else ("通知失敗", 500)

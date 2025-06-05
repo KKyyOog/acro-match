@@ -163,3 +163,14 @@ def update_birthday_if_exists(webhook_id, birthday_str):
             return True
     return False
 
+### liff_idからwebhookidを取得
+def get_webhook_id_from_liff_id(liff_id):
+    sheet = get_sheet("ユーザーIDマップ")
+    rows = sheet.get_all_values()
+    header = rows[0]
+    data = rows[1:]
+    
+    for row in data:
+        if row[2] == liff_id:  # 3列目がLIFF ID
+            return row[1]      # 2列目がWebhook ID
+    return None
