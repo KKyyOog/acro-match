@@ -9,6 +9,7 @@ import os
 from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret-key")
 
 csrf = CSRFProtect()
 csrf.init_app(app)
