@@ -9,7 +9,13 @@ from blueprints.link import link_bp
 from blueprints.admin import admin_bp
 from dotenv import load_dotenv
 import os
-print("GOOGLE_CREDENTIALS:", os.getenv("GOOGLE_CREDENTIALS")[:50])
+cred_json = os.getenv("GOOGLE_CREDENTIALS")
+
+# 👇 デバッグ用に表示（Renderログで確認）
+print("GOOGLE_CREDENTIALS content:", cred_json[:100] if cred_json else "NOT SET")
+
+if not cred_json:
+    raise ValueError("GOOGLE_CREDENTIALS not set")
 load_dotenv()  # 環境変数の読み込み（ローカル実行時用）
 
 app = Flask(__name__)
