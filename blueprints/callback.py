@@ -11,18 +11,19 @@ callback_bp = Blueprint("callback", __name__)
 @callback_bp.route("/callback", methods=["POST"])
 def handle_callback():
     data = request.get_json(silent=True) or {}
-    print("📩 Webhook受信:", data)
+    print("\U0001F4E9 Webhook受信:", data)
     return "OK", 200
 
 @callback_bp.route("", methods=["POST"])
 def receive_callback():
     try:
         data = request.get_json(force=True)
-        print("📩 Webhook受信:", data)
+        print("\U0001F4E9 Webhook受信:", data)
         events = data.get("events", [])
 
         for event in events:
             user_id = event.get("source", {}).get("userId")
+            webhook_id = event.get("webhookEventId")
             if not user_id:
                 continue
 
@@ -37,7 +38,7 @@ def receive_callback():
                     if len(parts) >= 2:
                         name, bday = parts[0].strip(), parts[1].strip()
                         if re.match(r"^\d{4}年\d{1,2}月\d{1,2}日$", bday):
-                            register_user_info(name, bday, user_id)
+                            register_user_info(name, bday, user_id, webhook_event_id=webhook_id)
                             send_line_message(user_id, f"{name} さん、登録ありがとうございます！\n生年月日 {bday} も登録しました。")
                             continue
 
@@ -45,7 +46,7 @@ def receive_callback():
                     updated = update_birthday_if_exists(user_id, msg)
                     send_line_message(user_id, f"生年月日 {msg} を登録しました。" if updated else "先にお名前を送ってください。")
                 else:
-                    register_user_info(msg, "", user_id)
+                    register_user_info(msg, "", user_id, webhook_event_id=webhook_id)
                     send_line_message(user_id, f"{msg} さん、登録ありがとうございます！")
 
         return "OK", 200
@@ -56,7 +57,7 @@ def receive_callback():
 @callback_bp.route("/interest", methods=["POST"])
 def receive_interest():
     try:
-        print("📨 興味あり受信:", request.json)
+        print("\U0001F4E8 興味あり受信:", request.json)
         return jsonify({"message": "受信OK"}), 200
     except Exception as e:
         log_exception(e, context="Callback /interest 処理")

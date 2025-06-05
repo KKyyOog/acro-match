@@ -7,15 +7,9 @@ from utils.sheets import (
  )
 from utils.logging_util import log_exception
 
-def register_user_info(name: str, birthday: str, liff_id: str):
-    """
-    ユーザー情報を一括登録：
-    - Webhook ID (LIFF ID) と名前のマッピング
-    - 生年月日の更新（存在する場合）
-    - LIFF ID による生年月日下4桁とのリンク
-    """
+def register_user_info(name: str, birthday: str, liff_id: str, webhook_event_id: str = None):
     try:
-        append_row_if_new_user(webhook_id=liff_id, name=name)
+        append_row_if_new_user(name=name, webhook_id=webhook_event_id)
 
         if birthday:
             update_birthday_if_exists(liff_id, birthday)
@@ -23,6 +17,5 @@ def register_user_info(name: str, birthday: str, liff_id: str):
             if len(digits) >= 4:
                 last4 = digits[-4:]
                 update_liff_id_in_user_map(name, last4, liff_id)
-
     except Exception as e:
         log_exception(e, context="register_user_info 処理")
