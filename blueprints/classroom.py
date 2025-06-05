@@ -5,17 +5,18 @@ from utils.settings import load_settings
 from utils.liff import get_liff_id
 from utils.notify import send_line_message
 from utils.logging_util import log_exception
+from flask_wtf.csrf import generate_csrf
 
 classroom_bp = Blueprint("classroom", __name__, url_prefix="/classroom")
 
-@classroom_bp.route("/form", methods=["GET"])
+@classroom_bp.route("/form")
 def show_form():
-    try:
-        return render_template("form_classroom.html", settings=load_settings(), liff_id=get_liff_id("classroom"))
-    except Exception as e:
-        log_exception(e, context="教室フォーム表示")
-        return "Internal Server Error", 500
-
+    return render_template(
+        "form_classroom.html",
+        settings=load_settings(),
+        liff_id=get_liff_id("classroom"),
+        csrf_token=generate_csrf()  # ← これを追加
+    )
 @classroom_bp.route("/submit", methods=["POST"])
 def submit():
     try:

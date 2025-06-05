@@ -6,10 +6,14 @@ from blueprints.link import link_bp
 from blueprints.admin import admin_bp
 from dotenv import load_dotenv
 import os
-
-load_dotenv()
+from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
+
+csrf = CSRFProtect()
+csrf.init_app(app)
+
+load_dotenv()
 
 # Blueprintの登録
 app.register_blueprint(alb_bp)

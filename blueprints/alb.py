@@ -5,6 +5,7 @@ from utils.settings import load_settings
 from utils.liff import get_liff_id
 from utils.user import register_user_info
 from utils.logging_util import log_exception
+from flask_wtf.csrf import generate_csrf
 
 alb_bp = Blueprint("alb", __name__, url_prefix="/alb")
 
@@ -12,6 +13,7 @@ alb_bp = Blueprint("alb", __name__, url_prefix="/alb")
 def show_register_form():
     try:
         return render_template("form_alb.html", settings=load_settings(), liff_id=get_liff_id("alb"), error_msg=request.args.get("error"))
+        csrf_token=generate_csrf()
     except Exception as e:
         log_exception(e, context="アルバイト登録フォーム表示")
         return "Internal Server Error", 500
