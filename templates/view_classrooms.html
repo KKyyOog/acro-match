@@ -53,23 +53,26 @@
       }
     }
 
-    async function submitForm(rowIndex) {
-      if (!window.userId) {
-        alert("ユーザー情報の取得に失敗しました");
-        return;
-      }
+    async function submitForm(liffId) {
+  if (!window.userId) {
+    alert("ユーザー情報の取得に失敗しました");
+    return;
+  }
 
-      try {
-        await fetch("/interest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: window.userId, row_index: rowIndex })
-        });
-        alert("送信しました！");
-      } catch (err) {
-        alert("送信エラー：" + err);
-      }
-    }
+  try {
+    await fetch("/interest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        liff_id: liffId,
+        user_name: window.userId  // 任意ならそのままでもOK
+      })
+    });
+    alert("送信しました！");
+  } catch (err) {
+    alert("送信エラー：" + err);
+  }
+}
 
     function showNotes(notes) {
       if (notes && notes.trim()) {
@@ -119,7 +122,7 @@
           <td>{{ row[3] }}</td>
           <td>{{ row[4] }}</td>
           <td>
-            <button type="button" onclick="submitForm('{{ row_index }}')">興味あり</button>
+            <button type="button" onclick="submitForm('{{ row[6] }}')">興味あり</button>
           </td>
         </tr>
       {% endfor %}

@@ -68,6 +68,8 @@ def callback():
 @callback_bp.route("/interest", methods=["POST"])
 def interest():
     data = request.get_json()
+    print("📥 受信データ:", data)
+    
     liff_id = data.get("liff_id")
     interested_user_name = data.get("user_name", "誰かが")
 
