@@ -15,7 +15,7 @@ csrf = CSRFProtect(app)
 
 # Blueprint登録
 app.register_blueprint(alb_bp)
-app.register_blueprint(classroom_bp)
+app.register_blueprint(classroom_bp, url_prefix="/classroom")
 app.register_blueprint(admin_bp)
 app.register_blueprint(callback_bp)
 app.register_blueprint(link_bp)

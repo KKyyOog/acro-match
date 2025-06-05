@@ -67,10 +67,13 @@
   console.log("📤 送信ペイロード:", payload);  // ← 追加
 
   try {
-    await fetch("/interest", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    await fetch("/classroom/interest", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    row_index: rowIndex,
+    user_id: window.userId
+    })
     });
     alert("送信しました！");
   } catch (err) {
