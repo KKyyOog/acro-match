@@ -33,13 +33,39 @@ def get_sheet(sheet_name):
         log_exception(e, context=f"シート取得失敗: {sheet_name}")
         raise
 
-def update_sheet_headers_for_alb(sheet, new_headers):
-    sheet.resize(rows=1)  # ヘッダーだけ残す
-    sheet.insert_row(new_headers, index=1)
-
-def update_sheet_headers_for_classroom(sheet, new_headers):
+def update_sheet_headers_for_alb(sheet, settings):
+    # 実際に欲しい項目だけ抽出
+    headers = [
+    settings.get("form_label_name", "ニックネーム"),
+    settings.get("form_label_birthday4", "誕生日4桁"),
+    settings.get("form_label_alb_experience", "経験"),
+    settings.get("form_label_alb_handslevel", "補助レベル"),
+    settings.get("form_label_area", "エリア"),
+    settings.get("form_label_available", "稼働可能日・時間"),
+    settings.get("form_label_reachtime", "連絡可能時間帯"),
+    "Webhook ID"
+]
     sheet.resize(rows=1)
-    sheet.insert_row(new_headers, index=1)
+    sheet.insert_row(headers, index=1)
+
+def update_sheet_headers_for_classroom(sheet, settings):
+    headers = [
+        settings.get("form_label_classroom_name", "教室名"),
+        settings.get("form_label_classroom_location", "場所"),
+        settings.get("form_label_classroom_date", "開催日"),
+        settings.get("form_label_classroom_experience", "希望する経験"),
+        settings.get("form_label_classroom_support_level", "補助レベル"),
+        settings.get("form_label_classroom_notes", "補足・備考"),
+        "Webhook ID"
+    ]
+
+    # カスタムフィールドも動的に追加
+    custom_fields = settings.get("custom_fields_classroom", [])
+    for field in custom_fields:
+        headers.append(field.get("label", field.get("name")))
+
+    sheet.resize(rows=1)
+    sheet.insert_row(headers, index=1)
 
 def get_webhook_id_from_liff_id(sheet, liff_id):
     try:
