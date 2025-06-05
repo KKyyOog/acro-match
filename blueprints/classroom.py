@@ -27,8 +27,8 @@ def submit():
         name = request.form.get("name")
         location = request.form.get("location")
         date = request.form.get("date")
-        experience_list = request.form.getlist("experience")
-        handslevel_list = request.form.getlist("handslevel")
+        experience_list = request.form.getlist("experience[]")
+        handslevel_list = request.form.getlist("handslevel[]")
         notes = request.form.get("notes", "")
         user_id = request.form.get("user_id", "")
 
