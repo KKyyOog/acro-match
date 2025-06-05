@@ -82,3 +82,42 @@ def update_liff_id_in_user_map(name: str, birthday4: str, liff_id: str) -> bool:
     except Exception as e:
         log_exception(e, context="LIFF ID更新")
         return False
+
+def update_sheet_headers_for_alb(sheet, settings: dict):
+    """
+    アルバイト登録シートの1行目ヘッダーを更新する。
+    """
+    try:
+        headers = [
+            settings.get("form_label_alb_name", "名前"),
+            "Webhook ID",
+            "LIFF ID",
+            settings.get("form_label_birthday4", "生年月日"),
+            "登録日時"
+        ]
+        sheet.delete_rows(1)  # ヘッダーを消す（既存の行）
+        sheet.insert_row(headers, index=1)
+    except Exception as e:
+        log_exception(e, context="アルバイトヘッダー更新")
+
+
+def update_sheet_headers_for_classroom(sheet, settings: dict):
+    """
+    教室登録シートの1行目ヘッダーを更新する。
+    """
+    try:
+        headers = [
+            settings.get("form_label_classroom_title", "教室名/イベント名"),
+            settings.get("form_label_classroom_location", "場所"),
+            settings.get("form_label_classroom_datetime", "日時"),
+            settings.get("form_label_classroom_experience", "希望する経験"),
+            settings.get("form_label_classroom_support_level", "補助レベル"),
+            settings.get("form_label_classroom_notes", "その他要望"),
+            "行インデックス",
+            "LIFF ID",
+            "登録日時"
+        ]
+        sheet.delete_rows(1)
+        sheet.insert_row(headers, index=1)
+    except Exception as e:
+        log_exception(e, context="教室ヘッダー更新")
