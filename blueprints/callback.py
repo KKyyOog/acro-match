@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, jsonify, request
 import json
 import os
 import sys
@@ -64,4 +64,9 @@ def callback():
         print("❌ Webhook処理エラー:\n", traceback.format_exc())
         return "Error", 500
 
+@callback_bp.route("/interest", methods=["POST"])
+def receive_interest():
+    data = request.json
+    print("📨 興味あり受信:", data)
+    return jsonify({"message": "受信OK"}), 200
 

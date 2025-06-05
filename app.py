@@ -32,3 +32,7 @@ def log_request_data():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+print("📜 Flask登録ルート一覧:")
+for rule in app.url_map.iter_rules():
+    print(f"🛣️ {rule} → {rule.endpoint}")
