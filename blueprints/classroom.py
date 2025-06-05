@@ -1,5 +1,4 @@
 # blueprints/classroom.py
-
 from flask import Blueprint, request, render_template, jsonify, redirect, url_for
 from utils.sheets import get_sheet, load_settings, update_sheet_headers_for_classroom
 from utils.liff import get_liff_id
@@ -11,9 +10,7 @@ classroom_bp = Blueprint("classroom", __name__, url_prefix="/classroom")
 @classroom_bp.route("/form", methods=["GET"])
 def show_form():
     try:
-        settings = load_settings()
-        liff_id = get_liff_id("classroom")
-        return render_template("form_classroom.html", settings=settings, liff_id=liff_id)
+        return render_template("form_classroom.html", settings=load_settings(), liff_id=get_liff_id("classroom"))
     except Exception as e:
         log_exception(e, context="教室フォーム表示")
         return "Internal Server Error", 500
@@ -23,11 +20,8 @@ def submit():
     try:
         settings = load_settings()
         sheet = get_sheet("教室登録シート")
-
-        # ✅ ヘッダー更新
         update_sheet_headers_for_classroom(sheet, settings)
 
-        # 🔁 フォーム入力の取得
         name = request.form.get("name")
         location = request.form.get("location")
         date = request.form.get("date")
@@ -36,13 +30,11 @@ def submit():
         notes = request.form.get("notes", "")
         user_id = request.form.get("user_id", "")
 
-        # 登録確認：アルバイト登録済かどうか
         alb_sheet = get_sheet("アルバイト登録シート")
         registered_albs = [row[-1] for row in alb_sheet.get_all_values()[1:]]
         if user_id not in registered_albs:
             return redirect(url_for("alb.show_register_form", error="need_alb"))
 
-        # 📋 書き込む行の構築
         row = [
             name,
             location,
@@ -52,13 +44,10 @@ def submit():
             notes,
         ]
 
-        # カスタム項目を追加
         for field in settings.get("custom_fields_classroom", []):
             row.append(request.form.get(field.get("name", ""), ""))
 
-        row.append(user_id)  # user_id を最後に
-
-        # 📤 Google Sheets に追記
+        row.append(user_id)
         sheet.append_row(row)
 
         return "教室登録が完了しました！募集一覧に掲載されているかご確認ください。"
@@ -84,27 +73,19 @@ def view_recruitment():
 def notify_interest():
     try:
         data = request.get_json(force=True)
-
         if not data or "row_index" not in data or "user_id" not in data:
             return "row_index または user_id がありません", 400
 
         row_index = int(data["row_index"])
-        user_id = data.get("user_id")
+        user_id = data["user_id"]
 
         sheet = get_sheet("教室登録シート")
         row = sheet.row_values(row_index)
 
-        name = row[0]
-        location = row[1]
-        datetime_str = row[2]
-        target_line_id = row[-1]
-
+        name, location, datetime_str, target_line_id = row[0], row[1], row[2], row[-1]
         message = (
             f"📢 アルバイトから興味ありの通知がありました！\n"
-            f"教室名：{name}\n"
-            f"場所：{location}\n"
-            f"日時：{datetime_str}\n"
-            f"連絡先：{user_id}"
+            f"教室名：{name}\n場所：{location}\n日時：{datetime_str}\n連絡先：{user_id}"
         )
 
         send_line_message(target_line_id, message)
