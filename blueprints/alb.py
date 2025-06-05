@@ -29,7 +29,9 @@ def submit_alb():
         sheet.delete_rows(1)
         headers = [
             settings.get("form_label_name", "名前"),
-            settings.get("form_label_alb_experience", "経験"),
+            settings.get("form_label_birthday4", "生年月日（月日4桁・例：0602）"),
+            settings.get("form_label_alb_experience", "経験（複数選択可）"),
+            settings.get("form_label_alb_handslevel", "補助レベル（複数選択可）"),
             settings.get("form_label_area", "希望エリア"),
             settings.get("form_label_available", "稼働可能日・時間"),
             settings.get("form_label_reachtime", "連絡可能時間帯")

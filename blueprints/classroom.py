@@ -106,7 +106,7 @@ def notify_interest():
         if not data or "row_index" not in data:
             return "row_index がありません", 400
         
-        row_index = int(data["row_index"]))
+        row_index = int(data["row_index"])
         user_id = data.get("user_id")  # 押した人（アルバイト）のuser_id
 
         sheet = get_sheet("教室登録シート")
