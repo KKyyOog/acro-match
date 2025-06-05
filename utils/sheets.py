@@ -121,3 +121,18 @@ def update_sheet_headers_for_classroom(sheet, settings: dict):
         sheet.insert_row(headers, index=1)
     except Exception as e:
         log_exception(e, context="教室ヘッダー更新")
+
+def get_webhook_id_from_liff_id(liff_id: str) -> str | None:
+    """
+    LIFF ID に対応する Webhook ID をユーザーIDマップから取得する。
+    """
+    try:
+        sheet = get_sheet("ユーザーIDマップ")
+        values = sheet.get_all_values()
+        for row in values[1:]:  # 1行目はヘッダー
+            if len(row) >= 3 and row[2] == liff_id:
+                return row[1]  # Webhook ID
+        return None
+    except Exception as e:
+        log_exception(e, context="LIFF ID → Webhook ID 取得")
+        return None
