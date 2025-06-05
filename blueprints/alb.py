@@ -4,6 +4,7 @@ from utils.sheets import get_sheet, load_settings, update_sheet_headers_for_alb
 from utils.liff import get_liff_id
 from utils.user import register_user_info
 from utils.logging_util import log_exception
+from utils.settings import load_settings
 
 alb_bp = Blueprint("alb", __name__, url_prefix="/alb")
 

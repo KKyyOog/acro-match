@@ -2,6 +2,8 @@
 from flask import Blueprint, request, render_template, redirect
 import json
 import os
+from utils.settings import load_settings
+
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 

@@ -4,6 +4,7 @@ from utils.sheets import get_sheet, load_settings, update_sheet_headers_for_clas
 from utils.liff import get_liff_id
 from utils.notify import send_line_message
 from utils.logging_util import log_exception
+from utils.settings import load_settings
 
 classroom_bp = Blueprint("classroom", __name__, url_prefix="/classroom")
 
