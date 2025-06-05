@@ -34,23 +34,29 @@
     }
 
     async function submitForm(rowIndex) {
-      if (!window.userId) {
-        alert("ユーザー情報の取得に失敗しました");
-        return;
-      }
+  if (!window.userId) {
+    alert("ユーザー情報の取得に失敗しました");
+    return;
+  }
 
-      try {
-        await fetch("/interest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: window.userId, row_index: rowIndex })
-        });
+  const payload = {
+    row_index: rowIndex,
+    user_id: window.userId
+  };
+  console.log("📤 送信ペイロード:", payload);  // ← 必ず確認
 
-        alert("送信しました！");
-      } catch (err) {
-        alert("送信エラー：" + err);
-      }
-    }
+  try {
+    await fetch("/interest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    alert("通知を送りました！");
+  } catch (err) {
+    alert("送信エラー：" + err);
+  }
+}
+
 
     window.onload = initializeLIFF;
   </script>
