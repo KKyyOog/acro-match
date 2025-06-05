@@ -5,20 +5,24 @@ from utils.sheets import (
     update_birthday_if_exists,
     update_liff_id_in_user_map
 )
+from utils.logging_util import log_exception  # ✅ ログ出力用に追加
 
 def register_user_info(name: str, birthday: str, liff_id: str):
     """
     ユーザー情報を一括登録：
-    - Webhook ID (LIFF ID) と名前のマッピングを登録
-    - 生年月日（任意）を登録
-    - LIFF ID と名前＋生年月日下4桁をマッピング
+    - Webhook ID (LIFF ID) と名前のマッピングを追加
+    - 生年月日を更新（存在する場合のみ）
+    - LIFF ID と名前・生年月日（下4桁）のマッピングを追加
     """
-    add_user_id_mapping_if_new(webhook_id=liff_id, name=name)
+    try:
+        add_user_id_mapping_if_new(webhook_id=liff_id, name=name)
 
-    # 生年月日が指定されている場合のみ登録処理を行う
-    if birthday:
-        update_birthday_if_exists(liff_id, birthday)
-        digits = ''.join(filter(str.isdigit, birthday))
-        if len(digits) >= 4:
-            last4 = digits[-4:]
-            update_liff_id_in_user_map(name, last4, liff_id)
+        if birthday:
+            update_birthday_if_exists(liff_id, birthday)
+            digits = ''.join(filter(str.isdigit, birthday))
+            if len(digits) >= 4:
+                last4 = digits[-4:]
+                update_liff_id_in_user_map(name, last4, liff_id)
+
+    except Exception as e:
+        log_exception(e, context="register_user_info 処理")

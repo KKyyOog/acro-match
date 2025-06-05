@@ -4,188 +4,81 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
-from utils.logging_util import log_exception  # 任意追加
+from utils.logging_util import log_exception  # ✅ ログユーティリティ
 
 load_dotenv()
 
-# ✅ 最上部に統一
+def get_google_credentials():
+    try:
+        credentials_json = os.getenv("GOOGLE_CREDENTIALS")
+        if not credentials_json:
+            raise ValueError("GOOGLE_CREDENTIALS が設定されていません")
+        info = json.loads(credentials_json)
+        scopes = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        return Credentials.from_service_account_info(info, scopes=scopes)
+    except Exception as e:
+        log_exception(e, context="Google認証取得")
+        raise
+
 def get_sheet(sheet_name: str):
-    sheet_id = os.getenv("SPREADSHEET_ID")
-    if sheet_id is None:
-        raise RuntimeError("❌ SPREADSHEET_ID が環境変数に設定されていません。")
-    creds = get_google_credentials()
-    client = gspread.authorize(creds)
-    spreadsheet = client.open_by_key(sheet_id)
-    return spreadsheet.worksheet(sheet_name)
+    try:
+        sheet_id = os.getenv("SPREADSHEET_ID")
+        if not sheet_id:
+            raise ValueError("SPREADSHEET_ID が環境変数に設定されていません。")
+        creds = get_google_credentials()
+        client = gspread.authorize(creds)
+        spreadsheet = client.open_by_key(sheet_id)
+        return spreadsheet.worksheet(sheet_name)
+    except Exception as e:
+        log_exception(e, context=f"シート取得: {sheet_name}")
+        raise
 
-# ✅ 明示的に役割を分ける
-def get_user_id_map_sheet():
-    return get_sheet("ユーザーIDマップ")
-
-### 設定ファイルの読み書き
 def load_settings():
-    default_settings = {
-        "title": "アルバイト登録",
-        "button_color": "#00b900",
-        "form_label_name": "ニックネーム",
-        "form_label_area": "希望エリア",
-        "form_label_available": "稼働可能日・時間",
-        "form_label_alb_experience": "経験",
-        "classroom_title": "教室登録",
-        "form_label_classroom_name": "教室名",
-        "form_label_classroom_location": "場所",
-        "form_label_classroom_date": "募集日時",
-        "form_label_classroom_experience": "希望する経験",
-        "form_label_classroom_handslevel": "補助レベル",
-        "form_label_classroom_notes": "その他ご要望・自由記述",
-        "custom_fields": [],
-        "custom_fields_classroom": []
-    }
     try:
         with open("settings.json", "r", encoding="utf-8") as f:
             saved = json.load(f)
-        if "custom_fields_form" in saved:
-            saved["custom_fields"] = saved["custom_fields_form"]
-        return {**default_settings, **saved}
+        return saved
     except Exception as e:
-        print(f"⚠️ load_settings error: {e}")
-        return default_settings
+        log_exception(e, context="settings.json 読み込み")
+        return {}
 
-def save_settings(data):
+def add_user_id_mapping_if_new(webhook_id: str, name: str):
     try:
-        with open("settings.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        sheet = get_sheet("ユーザーIDマップ")
+        values = sheet.get_all_values()
+        webhook_ids = [row[1] for row in values[1:] if len(row) > 1]
+
+        if webhook_id in webhook_ids:
+            return
+
+        sheet.append_row([name, webhook_id, "", "", datetime.now().strftime("%Y-%m-%d")])
     except Exception as e:
-        print(f"⚠️ save_settings error: {e}")
+        log_exception(e, context="ユーザーIDマップ追加")
 
-def get_google_credentials():
-    credentials_json = os.getenv("GOOGLE_CREDENTIALS")
-    if not credentials_json:
-        raise ValueError("GOOGLE_CREDENTIALS environment variable not set.")
+def update_birthday_if_exists(webhook_id: str, birthday: str) -> bool:
+    try:
+        sheet = get_sheet("ユーザーIDマップ")
+        values = sheet.get_all_values()
 
-    credentials_dict = json.loads(credentials_json)
+        for i, row in enumerate(values[1:], start=2):
+            if len(row) > 1 and row[1] == webhook_id:
+                sheet.update_cell(i, 4, birthday)
+                return True
+        return False
+    except Exception as e:
+        log_exception(e, context="誕生日更新")
+        return False
 
-    scopes = ["https://www.googleapis.com/auth/spreadsheets",  # ← これが重要
-              "https://www.googleapis.com/auth/drive"]
+def update_liff_id_in_user_map(name: str, birthday4: str, liff_id: str) -> bool:
+    try:
+        sheet = get_sheet("ユーザーIDマップ")
+        values = sheet.get_all_values()
 
-    return Credentials.from_service_account_info(credentials_dict, scopes=scopes)
-
-### LIFF ID取得
-def get_liff_id(context="default"):
-    return {
-        "classroom": os.getenv("LIFF_ID_classroom", ""),
-        "alb": os.getenv("LIFF_ID_alb", ""),
-        "recruit": os.getenv("LIFF_ID_recruit", ""),
-    }.get(context, "")
-
-### アルバイト登録シートのヘッダー更新
-def update_sheet_headers_for_alb(sheet, settings):
-    headers = [
-        settings.get("form_label_alb_name", "ニックネーム"),
-        settings.get("form_label_birthday4", "生年月日（月日4桁・例：0602）"),
-        settings.get("form_label_alb_experience", "経験（複数選択可）"),
-        settings.get("form_label_alb_handslevel", "補助レベル（複数選択可）"),
-        settings.get("form_label_area", "希望エリア"),
-        settings.get("form_label_available", "稼働可能日・時間"),
-        settings.get("form_label_reachtime", "連絡可能時間帯"),
-    ]
-    for field in settings.get("custom_fields", []):
-        headers.append(field.get("label", ""))
-    headers.append("user_id")
-    sheet.delete_rows(1)
-    sheet.insert_row(headers, index=1)
-
-# utils/sheets.py に追加
-def update_sheet_headers(sheet, header_labels):
-    sheet.delete_rows(1)
-    sheet.insert_row(header_labels, index=1)
-
-
-### 教室登録シートのヘッダー更新
-def update_sheet_headers_for_classroom(sheet, settings):
-    headers = [
-        settings.get("form_label_classroom_name", "教室名/イベント名"),
-        settings.get("form_label_classroom_location", "場所"),
-        settings.get("form_label_classroom_date", "募集日時"),
-        settings.get("form_label_classroom_experience", "希望する経験（複数選択可"),
-        settings.get("form_label_classroom_handslevel", "補助レベル（複数選択可）"),
-        settings.get("form_label_classroom_notes", "その他ご要望・自由記述"),
-    ]
-    for field in settings.get("custom_fields_classroom", []):
-        headers.append(field.get("label", ""))
-    headers.append("user_id")
-    sheet.delete_rows(1)
-    sheet.insert_row(headers, index=1)
-
-### 条件マッチング検索（教室 → アルバイト）
-def find_matching_alb(sheet, area, experience_required, datetime_str):
-    all_rows = sheet.get_all_records()
-    matched = []
-    for row in all_rows:
-        area_match = area in row.get("希望エリア", "")
-        date_match = datetime_str[:10] in row.get("稼働可能日・時間", "")
-        handslevel = row.get("補助レベル", "")
-        exp_match = experience_required in handslevel
-        if area_match or date_match or exp_match:
-            matched.append(row.get("user_id"))
-    return matched
-
-### Webhook ID と名前のマッピングを追加
-def add_user_id_mapping_if_new(webhook_id, name):
-    sheet = get_sheet("ユーザーIDマップ")
-    all_rows = sheet.get_all_values()[1:]
-    existing_ids = [row[1] for row in all_rows]
-    if webhook_id not in existing_ids:
-        today = datetime.now().strftime("%Y-%m-%d")
-        sheet.append_row([name, webhook_id, "", "", today])
-        print(f"📝 IDマッピング新規登録: {name} / {webhook_id}")
-    else:
-        print(f"✅ 既に登録済: {webhook_id}")
-
-### ニックネームと生年月日で Webhook ID を照合
-def update_liff_id_in_user_map(nickname, birthday_last4, new_liff_id):
-    sheet = get_sheet("ユーザーIDマップ")
-    records = sheet.get_all_records()
-
-    for i, row in enumerate(records):
-        name_match = row.get("ニックネーム") == nickname
-
-        # 生年月日の下4桁を抽出（例: 2005年06月02日 → 0602）
-        birthday = row.get("生年月日", "")
-        bday_digits = ''.join(filter(str.isdigit, birthday))  # 20050602
-        bday_last4 = bday_digits[-4:] if len(bday_digits) >= 4 else ""
-
-        bday_match = bday_last4 == birthday_last4
-
-        if name_match and bday_match:
-            # C列（3番目）が LIFF ID 列 → 2行目以降なので i+2
-            sheet.update_cell(i + 2, 3, new_liff_id)
-            print(f"✅ LIFF ID を更新: {nickname} / {birthday_last4}")
-            return True
-
-    print("❌ 一致するユーザーが見つかりません")
-    return False
-
-
-### 生年月日を更新
-def update_birthday_if_exists(webhook_id, birthday_str):
-    sheet = get_sheet("ユーザーIDマップ")
-    records = sheet.get_all_values()
-    for idx, row in enumerate(records[1:], start=2):
-        if row[1] == webhook_id:
-            sheet.update_cell(idx, 4, birthday_str)
-            return True
-    return False
-
-### liff_idからwebhookidを取得
-def get_webhook_id_from_liff_id(liff_id):
-    sheet = get_sheet("ユーザーIDマップ")
-    rows = sheet.get_all_values()
-    header = rows[0]
-    data = rows[1:]
-    
-    for row in data:
-        if row[2] == liff_id:  # 3列目がLIFF ID
-            return row[1]      # 2列目がWebhook ID
-    return None
-
+        for i, row in enumerate(values[1:], start=2):
+            if len(row) >= 4 and row[0] == name and row[3].endswith(birthday4):
+                sheet.update_cell(i, 3, liff_id)
+                return True
+        return False
+    except Exception as e:
+        log_exception(e, context="LIFF ID更新")
+        return False
