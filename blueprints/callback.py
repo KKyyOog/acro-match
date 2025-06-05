@@ -11,6 +11,13 @@ callback_bp = Blueprint("callback", __name__, url_prefix="/callback")
 
 user_state = {}  # 例： {user_id: {'step': 'awaiting_birthday', 'name': '山田太郎'}}
 
+@callback_bp.route("/callback", methods=["POST"])
+def handle_callback():
+    data = request.get_json(silent=True) or {}
+    # 必要に応じて LINE webhook などの処理を書く
+    print("📩 Webhook受信:", data)
+    return "OK", 200
+
 @callback_bp.route("/", methods=["POST"])
 def receive_callback():
     try:
