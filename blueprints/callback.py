@@ -18,6 +18,7 @@ def handle_callback():
 def receive_callback():
     try:
         data = request.get_json(force=True)
+        print("📩 Webhook受信:", data)
         events = data.get("events", [])
 
         for event in events:

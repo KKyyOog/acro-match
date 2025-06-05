@@ -20,7 +20,7 @@ load_dotenv()
 # Blueprintの登録
 app.register_blueprint(alb_bp)
 app.register_blueprint(classroom_bp)
-app.register_blueprint(callback_bp)
+app.register_blueprint(callback_bp, url_prefix="/callback")
 app.register_blueprint(link_bp)
 app.register_blueprint(admin_bp)
 
