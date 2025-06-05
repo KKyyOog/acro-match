@@ -72,7 +72,7 @@ def update_liff_id_in_user_map(name, last4, liff_id, sheet_name="ユーザー名
     return False
 
 
-def append_row_if_new_user(name, birthday, liff_id, sheet_name="ユーザー情報"):
+def append_row_if_new_user(name, birthday, liff_id, webhook_id=None, sheet_name="ユーザー情報"):
     sheet = get_sheet(sheet_name)
     records = sheet.get_all_records()
 
@@ -80,7 +80,7 @@ def append_row_if_new_user(name, birthday, liff_id, sheet_name="ユーザー情�
         if row.get("名前") == name and row.get("誕生日") == birthday and row.get("LIFF ID") == liff_id:
             return False  # Already exists
 
-    new_row = [name, birthday, liff_id]
+    new_row = [name, birthday, liff_id, webhook_id or ""]
     headers = sheet.row_values(1)
     padded_row = new_row + [""] * (len(headers) - len(new_row))
     sheet.append_row(padded_row)
