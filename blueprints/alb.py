@@ -27,8 +27,8 @@ def submit():
 
         name = request.form.get("name", "")
         birthday4 = request.form.get("birthday4", "")
-        experience_str = ", ".join(request.form.getlist("experience"))
-        handslevel_str = ", ".join(request.form.getlist("handslevel"))
+        experience_str = ", ".join(request.form.getlist("experience[]"))
+        handslevel_str = ", ".join(request.form.getlist("handslevel[]"))
         area = request.form.get("area", "")
         available = request.form.get("available", "")
         reachtime = request.form.get("reachtime", "")

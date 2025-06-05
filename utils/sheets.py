@@ -43,10 +43,12 @@ def update_sheet_headers_for_alb(sheet, settings):
     settings.get("form_label_area", "エリア"),
     settings.get("form_label_available", "稼働可能日・時間"),
     settings.get("form_label_reachtime", "連絡可能時間帯"),
-    "Webhook ID"
+    "LIFF ID"
 ]
-    sheet.resize(rows=1)
-    sheet.insert_row(headers, index=1)
+    existing_headers = sheet.row_values(1)
+    if existing_headers != headers:
+        sheet.resize(rows=1)  # ← すでにあるときは実行されないように
+        sheet.insert_row(headers, index=1)
 
 def update_sheet_headers_for_classroom(sheet, settings):
     headers = [
@@ -56,8 +58,12 @@ def update_sheet_headers_for_classroom(sheet, settings):
         settings.get("form_label_classroom_experience", "希望する経験"),
         settings.get("form_label_classroom_support_level", "補助レベル"),
         settings.get("form_label_classroom_notes", "補足・備考"),
-        "Webhook ID"
+        "LIFF ID"
     ]
+    existing_headers = sheet.row_values(1)
+    if existing_headers != headers:
+        sheet.resize(rows=1)  # ← すでにあるときは実行されないように
+        sheet.insert_row(headers, index=1)
 
     # カスタムフィールドも動的に追加
     custom_fields = settings.get("custom_fields_classroom", [])
