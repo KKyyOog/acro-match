@@ -1,12 +1,16 @@
 from flask import Blueprint, request, render_template, redirect
-from utils.sheets import load_settings, save_settings
 import json
 
-def load_settings():
-    with open("settings.json", "r", encoding="utf-8") as f:
-        return json.load(f)
-
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+
+def load_settings():
+    try:
+        with open("settings.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
 
 @admin_bp.route("/", methods=["GET", "POST"])
 def admin():
@@ -51,6 +55,5 @@ def admin():
 
         return redirect("/admin")
 
-    # GET時は読み込んで表示
     settings = load_settings()
     return render_template("admin.html", settings=settings)
