@@ -50,3 +50,38 @@ def get_webhook_id_from_liff_id(sheet, liff_id):
     except Exception as e:
         log_exception(e, context="LIFF ID 検索中にエラー")
     return None
+
+def update_birthday_if_exists(liff_id, birthday, sheet_name="ユーザー情報"):
+    sheet = get_sheet(sheet_name)
+    records = sheet.get_all_records()
+    for idx, row in enumerate(records, start=2):  # 2行目以降
+        if row.get("LIFF ID") == liff_id:
+            col_index = list(row.keys()).index("誕生日") + 1
+            sheet.update_cell(idx, col_index, birthday)
+            return True
+    return False
+
+def update_liff_id_in_user_map(name, last4, liff_id, sheet_name="ユーザー名マッピング"):
+    sheet = get_sheet(sheet_name)
+    records = sheet.get_all_records()
+    for idx, row in enumerate(records, start=2):  # 2行目以降
+        if row.get("名前") == name and str(row.get("誕生日下4桁")) == str(last4):
+            col_index = list(row.keys()).index("LIFF ID") + 1
+            sheet.update_cell(idx, col_index, liff_id)
+            return True
+    return False
+
+
+def append_row_if_new_user(name, birthday, liff_id, sheet_name="ユーザー情報"):
+    sheet = get_sheet(sheet_name)
+    records = sheet.get_all_records()
+
+    for row in records:
+        if row.get("名前") == name and row.get("誕生日") == birthday and row.get("LIFF ID") == liff_id:
+            return False  # Already exists
+
+    new_row = [name, birthday, liff_id]
+    headers = sheet.row_values(1)
+    padded_row = new_row + [""] * (len(headers) - len(new_row))
+    sheet.append_row(padded_row)
+    return True
