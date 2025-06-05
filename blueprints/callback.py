@@ -14,7 +14,7 @@ def handle_callback():
     print("📩 Webhook受信:", data)
     return "OK", 200
 
-@callback_bp.route("/", methods=["POST"])
+@callback_bp.route("", methods=["POST"])
 def receive_callback():
     try:
         data = request.get_json(force=True)
