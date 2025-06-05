@@ -9,7 +9,7 @@ from blueprints.link import link_bp
 from blueprints.admin import admin_bp
 from dotenv import load_dotenv
 import os
-
+print("🧪 環境変数一覧:", os.environ.keys())
 load_dotenv()  # 環境変数の読み込み（ローカル実行時用）
 
 app = Flask(__name__)

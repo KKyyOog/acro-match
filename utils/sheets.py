@@ -82,3 +82,16 @@ def update_sheet_headers_for_classroom(sheet, settings):
     headers.append("LINE ID")
     sheet.resize(rows=1)
     sheet.insert_row(headers, index=1)
+
+def get_webhook_id_from_liff_id(liff_id: str) -> str:
+    """
+    ユーザー対応表から LIFF ID に対応する Webhook ID を探す
+    """
+    try:
+        sheet = get_sheet("ユーザー対応表")
+        for row in sheet.get_all_values():
+            if len(row) >= 4 and row[3] == liff_id:
+                return row[0]  # Webhook ID
+    except Exception as e:
+        log_exception(e, context="LIFF ID から Webhook ID 取得")
+    return ""
