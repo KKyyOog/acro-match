@@ -9,7 +9,7 @@ from utils.logging_util import log_exception
 
 def register_user_info(name: str, birthday: str, liff_id: str, webhook_event_id: str = None):
     try:
-        append_row_if_new_user(name=name, webhook_id=webhook_event_id)
+        append_row_if_new_user(name, birthday, liff_id, webhook_id=webhook_event_id)
 
         if birthday:
             update_birthday_if_exists(liff_id, birthday)
