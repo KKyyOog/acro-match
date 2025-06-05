@@ -65,16 +65,3 @@ def callback():
         return "Error", 500
 
 
-@callback_bp.route("/interest", methods=["POST"])
-def interest():
-    data = request.get_json()
-    print("📥 受信データ:", data)
-    
-    liff_id = data.get("liff_id")
-    interested_user_name = data.get("user_name", "誰かが")
-
-    if not liff_id:
-        return "LIFF ID がありません", 400
-
-    success = notify_classroom_of_interest(liff_id, interested_user_name)
-    return ("通知成功", 200) if success else ("通知失敗", 500)
