@@ -7,7 +7,6 @@ from utils.notify import send_line_message
 from utils.logging_util import log_exception
 from flask_wtf.csrf import generate_csrf
 from utils.sheets import get_sheet, get_chat_liff_id_by_app_liff_id
-from utils.notify import send_line_message
 
 classroom_bp = Blueprint("classroom", __name__, url_prefix="/classroom")
 
