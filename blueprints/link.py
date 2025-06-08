@@ -1,6 +1,6 @@
 # blueprints/link.py
 from flask import Blueprint, request
-from utils.sheets import update_liff_id_in_user_map
+from utils.sheets import update_liff_id_by_name_and_birthday4
 from utils.logging_util import log_exception
 
 link_bp = Blueprint("link", __name__, url_prefix="/link")
@@ -13,7 +13,7 @@ def link_liff_id():
         birthday4 = data.get("birthday4")
         liff_id = data.get("liff_id")
 
-        if update_liff_id_in_user_map(name, birthday4, liff_id):
+        if update_liff_id_by_name_and_birthday4(name, birthday4, liff_id):
             return "LIFF ID 登録完了", 200
         return "該当ユーザーが見つかりません", 404
     except Exception as e:
