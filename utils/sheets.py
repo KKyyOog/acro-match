@@ -102,3 +102,18 @@ def get_chat_liff_id_by_app_liff_id(app_liff_id: str, user_sheet_name: str = "�
         if row.get("アプリ LIFF ID") == app_liff_id:
             return row.get("チャット LIFF ID")
     return None
+
+def highlight_classroom_row(row_index: int, sheet_name: str = "教室登録シート"):
+    sheet = get_sheet(sheet_name)
+    # 行番号は1オリジンで、ヘッダーを含めて+2する（ヘッダー+row_index）
+    row_num = row_index + 2
+    last_col = len(sheet.row_values(1))  # ヘッダー行の列数取得
+
+    cell_range = f"A{row_num}:{chr(64 + last_col)}{row_num}"
+    sheet.format(cell_range, {
+        "backgroundColor": {
+            "red": 0.8,
+            "green": 1.0,
+            "blue": 0.8
+        }
+    })

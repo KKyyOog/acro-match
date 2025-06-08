@@ -1,12 +1,11 @@
 # blueprints/classroom.py
 from flask import Blueprint, request, render_template, jsonify, redirect, url_for
-from utils.sheets import get_sheet
 from utils.settings import load_settings
 from utils.liff import get_liff_id
 from utils.notify import send_line_message
 from utils.logging_util import log_exception
 from flask_wtf.csrf import generate_csrf
-from utils.sheets import get_sheet, get_chat_liff_id_by_app_liff_id
+from utils.sheets import get_sheet, get_chat_liff_id_by_app_liff_id, highlight_classroom_row
 
 classroom_bp = Blueprint("classroom", __name__, url_prefix="/classroom")
 
@@ -77,6 +76,9 @@ def handle_interest():
         data = request.get_json(force=True)
         user_app_liff_id = data.get("user_id")  # LIFF 経由で取得
         row_index = int(data.get("row_index", -1))
+
+        # ★ 行の色を変更（視覚マーカー）
+        highlight_classroom_row(row_index)
 
         if row_index < 0 or not user_app_liff_id:
             return {"error": "無効な入力"}, 400
