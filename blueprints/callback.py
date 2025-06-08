@@ -2,7 +2,6 @@
 from flask import Blueprint, request, jsonify
 import re
 from utils.user import register_user_info
-from utils.sheets import update_birthday_if_exists
 from utils.notify import send_line_message
 from utils.logging_util import log_exception
 from datetime import datetime
