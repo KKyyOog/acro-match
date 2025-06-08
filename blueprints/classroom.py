@@ -101,7 +101,8 @@ def handle_interest():
         classroom_name = row[0] if len(row) > 0 else "（名称不明）"
 
         # ユーザー情報からチャット用LIFF IDを取得
-        chat_liff_id = get_chat_liff_id_by_app_liff_id(user_app_liff_id)
+        teacher_app_liff_id = row[-1]
+        chat_liff_id = get_chat_liff_id_by_app_liff_id(teacher_app_liff_id)
         if not chat_liff_id:
             return {"error": "ユーザーが見つかりません"}, 404
 
@@ -116,4 +117,3 @@ def handle_interest():
     except Exception as e:
         print("❌ 教室興味通知エラー:", e)
         return {"error": "サーバーエラー"}, 500
-    
