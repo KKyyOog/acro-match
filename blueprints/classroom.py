@@ -72,10 +72,24 @@ def view_recruitment():
  
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
-    data = request.get_json(force=True)
-    print("📩 受信データ:", data)
+    try:
+        data = request.get_json(force=True)
+        print("📩 受信データ:", data)
 
-    row_index_raw = data.get("row_index")
-    user_id = data.get("user_id")
-    print("🔎 row_index:", row_index_raw)
-    print("🔎 user_id:", user_id)
+        # Validate required fields
+        if not data or "row_index" not in data or "user_id" not in data:
+            print("❌ 必須データが不足しています:", data)
+            return "Bad Request: Missing required data", 400
+
+        row_index_raw = data.get("row_index")
+        user_id = data.get("user_id")
+        print("🔎 row_index:", row_index_raw)
+        print("🔎 user_id:", user_id)
+
+        # Process the interest (e.g., send a notification)
+        # Add your logic here...
+
+        return "Interest recorded successfully", 200
+    except Exception as e:
+        log_exception(e, context="興味あり処理")
+        return "Internal Server Error", 500

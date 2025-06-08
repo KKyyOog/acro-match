@@ -46,14 +46,20 @@
   console.log("📤 送信ペイロード:", payload);  // ← 必ず確認
 
   try {
-    await fetch("/interest", {
+    await fetch("/classroom/interest", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    alert("通知を送りました！");
-  } catch (err) {
-    alert("送信エラー：" + err);
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        row_index: "2",
+        user_id: "Uxxxxxxxxxxxxxxxxxx"
+      })
+    })
+    .then(response => response.text())
+    .then(data => console.log(data));
+  } catch (error) {
+    console.error("Error:", error);
   }
 }
 
