@@ -1,6 +1,7 @@
 import os
 import json
 import gspread
+from typing import Optional
 from oauth2client.service_account import ServiceAccountCredentials
 from utils.logging_util import log_exception
 
