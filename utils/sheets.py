@@ -91,44 +91,41 @@ def update_birthday_if_exists(liff_id, birthday, sheet_name="ユーザー情報"
             return True
     return False
 
-def update_liff_id_in_user_map(name, last4, liff_id, sheet_name="ユーザー情報"):
-    sheet = get_sheet(sheet_name)
-    records = sheet.get_all_records()
-    for idx, row in enumerate(records, start=2):
-        if row.get("名前") == name and str(row.get("誕生日下4桁")) == str(last4):
-            col_index = list(row.keys()).index("LIFF ID") + 1
-            sheet.update_cell(idx, col_index, liff_id)
-            return True
-    return False
-
 def append_row_if_new_user(name, birthday, liff_id, webhook_id=None, sheet_name="ユーザー情報"):
     sheet = get_sheet(sheet_name)
     records = sheet.get_all_records()
 
-    for row in records:
-        if row.get("名前") == name and row.get("誕生日") == birthday and row.get("LIFF ID") == liff_id:
-            return False  # Already exists
+    for idx, row in enumerate(records, start=2):
+        if row.get("LIFF ID") == liff_id:
+            updated = False
+            # 名前がなければ更新
+            if not row.get("名前") and name:
+                name_col = list(row.keys()).index("名前") + 1
+                sheet.update_cell(idx, name_col, name)
+                updated = True
+            # 誕生日がなければ更新
+            if not row.get("誕生日") and birthday:
+                bday_col = list(row.keys()).index("誕生日") + 1
+                sheet.update_cell(idx, bday_col, birthday)
+                updated = True
+            # Webhook ID の更新
+            if webhook_id and not row.get("Webhook ID"):
+                hook_col = list(row.keys()).index("Webhook ID") + 1
+                sheet.update_cell(idx, hook_col, webhook_id)
+                updated = True
+            return not updated  # 更新だけで新規追加していない
 
+    # 見つからなければ新規追加
     headers = sheet.row_values(1)
     new_row_dict = {
         "名前": name,
         "誕生日": birthday,
         "LIFF ID": liff_id,
-        "webhook ID": webhook_id or ""
+        "Webhook ID": webhook_id or ""
     }
     row = [new_row_dict.get(h, "") for h in headers]
     sheet.append_row(row)
     return True
-
-def update_liff_id_from_nickname_birthday(nickname, birthday4, liff_id, sheet_name="ユーザー情報"):
-    sheet = get_sheet(sheet_name)
-    records = sheet.get_all_records()
-    for idx, row in enumerate(records, start=2):
-        if row.get("名前") == nickname and str(row.get("誕生日下4桁")) == str(birthday4):
-            col_index = list(row.keys()).index("LIFF ID") + 1
-            sheet.update_cell(idx, col_index, liff_id)
-            return True
-    return False
 
 def update_liff_id_by_name_and_birthday4(nickname, birthday4, liff_id, sheet_name="ユーザー情報"):
     sheet = get_sheet(sheet_name)
@@ -141,4 +138,15 @@ def update_liff_id_by_name_and_birthday4(nickname, birthday4, liff_id, sheet_nam
                 col_index = list(row.keys()).index("LIFF ID") + 1
                 sheet.update_cell(idx, col_index, liff_id)
                 return True
+    return False
+
+def update_liff_id_by_name_birthday(name, birthday, liff_id, sheet_name="ユーザー情報"):
+    sheet = get_sheet(sheet_name)
+    records = sheet.get_all_records()
+
+    for idx, row in enumerate(records, start=2):
+        if row.get("名前") == name and row.get("誕生日") == birthday:
+            col_index = list(row.keys()).index("LIFF ID") + 1
+            sheet.update_cell(idx, col_index, liff_id)
+            return True
     return False

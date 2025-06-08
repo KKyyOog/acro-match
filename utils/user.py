@@ -2,22 +2,19 @@
 from utils.sheets import append_row_if_new_user
 from utils.sheets import (
      append_row_if_new_user,
-     update_birthday_if_exists,
-     update_liff_id_in_user_map,
-     update_liff_id_by_name_and_birthday4
+     update_liff_id_by_name_birthday
  )
 from utils.logging_util import log_exception
 
-def register_user_info(name: str, birthday: str, liff_id: str, webhook_event_id: str = None):
+def register_user_info(name: str, birthday: str, liff_id: str = "", webhook_event_id: str = None):
     try:
-        append_row_if_new_user(name, birthday, liff_id, webhook_id=webhook_event_id)
+        # Webhook ID がある場合（チャット登録）
+        if webhook_event_id:
+            append_row_if_new_user(name, birthday, "", webhook_id=webhook_event_id)
 
-        if birthday:
-            update_birthday_if_exists(liff_id, birthday)
-            digits = ''.join(filter(str.isdigit, birthday))
-            if len(digits) >= 4:
-                last4 = digits[-4:]
-                update_liff_id_in_user_map(name, last4, liff_id)
-                update_liff_id_by_name_and_birthday4(name, last4, liff_id)  # ←★ここを追加
+        # LIFF ID がある場合（アルバイト登録時など）
+        if liff_id and name and birthday:
+            update_liff_id_by_name_birthday(name, birthday, liff_id)
+
     except Exception as e:
         log_exception(e, context="register_user_info 処理")
