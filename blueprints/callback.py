@@ -43,7 +43,7 @@ def receive_callback():
                         name, bday = parts[0].strip(), parts[1].strip()
                         if re.match(r"^\d{4}年\d{1,2}月\d{1,2}日$", bday):
                             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                            register_user_info(name, bday, user_id, webhook_event_id=webhook_id)
+                            register_user_info(name, bday, user_id)
                             send_line_message(user_id, f"{name} さん、登録ありがとうございます！\n生年月日 {bday} も登録しました。")
                             user_states[user_id] = {'name': name}
                             continue
