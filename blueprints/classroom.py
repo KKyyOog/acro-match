@@ -74,53 +74,24 @@ def view_recruitment():
 def handle_interest():
     try:
         data = request.get_json(force=True)
-        print("📩 受信データ:", data)
-        user_app_liff_id = data.get("user_id")  # LIFF 経由で取得
-        row_index = data.get("row_index", -1)
-        print("🧩 row_index raw:", row_index)
-        print("🧩 user_id:", user_app_liff_id)
+        row_index = int(data.get("row_index", -1))
 
-        try:
-            row_index = int(row_index)
-        except (TypeError, ValueError):
-            return {"error": "row_index が整数でない"}, 400
-        
-        if row_index < 0 or not user_app_liff_id:
-            return {"error": "無効な入力"}, 400
-        
-        # ここで実際の処理（色変更など）を行う
-        highlight_classroom_row(row_index)
+        if row_index < 0:
+            return {"error": "row_indexが不正"}, 400
 
-        classroom_sheet = get_sheet("教室登録シート")
-        classroom_rows = classroom_sheet.get_all_values()
+        # 教室登録シートの取得
+        sheet = get_sheet("教室登録シート")
+        rows = sheet.get_all_values()
 
-        if row_index + 1 >= len(classroom_rows):
+        if row_index + 1 >= len(rows):
             return {"error": "行が存在しません"}, 404
 
-        row = classroom_rows[row_index + 1]  # ヘッダーを除いた実行対象
-        classroom_name = row[0] if len(row) > 0 else "（名称不明）"
+        # 行の取得（1行目はヘッダーなので +1）
+        classroom_row = rows[row_index + 1]
+        print("📚 興味ありが押された教室の情報:", classroom_row)
 
-        # ユーザー情報からチャット用LIFF IDを取得
-        print("👨‍🏫 教室登録行:", row)
-        teacher_app_liff_id = row[-1]
-        print("🔗 教室登録者の app_liff_id:", teacher_app_liff_id)
-        chat_liff_id = get_chat_liff_id_by_app_liff_id(teacher_app_liff_id)
-        
-        if not chat_liff_id:
-            print("❌ 教室登録者がユーザー情報シートに存在しません")
-            return {"error": "ユーザーが見つかりません"}, 404
-        if not teacher_app_liff_id or not chat_liff_id:
-            print("⚠️ 通知先が見つかりません。スキップします。")
-            return {"message": "通知スキップ（教室登録者不明）"}, 200
-
-        # 通知送信
-        msg = f"あなたの教室「{classroom_name}」に興味を持っている人がいます！"
-        success, err = send_line_message(chat_liff_id, msg)
-        if not success:
-            return {"error": err}, 500
-
-        return {"message": "通知送信完了"}, 200
+        return {"message": "ログ出力完了"}, 200
 
     except Exception as e:
-        print("❌ 教室興味通知エラー:", e)
+        print("❌ 処理エラー:", e)
         return {"error": "サーバーエラー"}, 500
