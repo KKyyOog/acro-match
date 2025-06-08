@@ -101,10 +101,17 @@ def handle_interest():
         classroom_name = row[0] if len(row) > 0 else "（名称不明）"
 
         # ユーザー情報からチャット用LIFF IDを取得
+        print("👨‍🏫 教室登録行:", row)
         teacher_app_liff_id = row[-1]
+        print("🔗 教室登録者の app_liff_id:", teacher_app_liff_id)
         chat_liff_id = get_chat_liff_id_by_app_liff_id(teacher_app_liff_id)
+        
         if not chat_liff_id:
+            print("❌ 教室登録者がユーザー情報シートに存在しません")
             return {"error": "ユーザーが見つかりません"}, 404
+        if not teacher_app_liff_id or not chat_liff_id:
+            print("⚠️ 通知先が見つかりません。スキップします。")
+            return {"message": "通知スキップ（教室登録者不明）"}, 200
 
         # 通知送信
         msg = f"あなたの教室「{classroom_name}」に興味を持っている人がいます！"
