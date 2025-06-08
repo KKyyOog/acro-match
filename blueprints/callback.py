@@ -5,6 +5,7 @@ from utils.user import register_user_info
 from utils.sheets import update_birthday_if_exists
 from utils.notify import send_line_message
 from utils.logging_util import log_exception
+from datetime import datetime
 
 callback_bp = Blueprint("callback", __name__)
 
@@ -31,7 +32,7 @@ def receive_callback():
                 continue
 
             if event.get("type") == "follow":
-                send_line_message(user_id, "友だち追加ありがとうございます！\nまずお名前を送ってください。その後、生年月日（〇〇〇〇年〇〇月〇〇日）を送ってください。")
+                send_line_message(user_id, "友だち追加ありがとうございます！\nまずお名前を送ってください。その後、生年月日（○○○○年○○月○○日）を送ってください。")
 
             elif event.get("type") == "message":
                 msg = event.get("message", {}).get("text", "").strip()
@@ -42,15 +43,17 @@ def receive_callback():
                     if len(parts) >= 2:
                         name, bday = parts[0].strip(), parts[1].strip()
                         if re.match(r"^\d{4}年\d{1,2}月\d{1,2}日$", bday):
+                            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                             register_user_info(name, bday, user_id, webhook_event_id=webhook_id)
                             send_line_message(user_id, f"{name} さん、登録ありがとうございます！\n生年月日 {bday} も登録しました。")
-                            user_states[user_id] = {'name': name}  # 名前も保存しておく
+                            user_states[user_id] = {'name': name}
                             continue
 
                 # 生年月日単独パターン
                 if re.match(r"^\d{4}年\d{1,2}月\d{1,2}日$", msg):
                     name = user_states.get(user_id, {}).get("name")
                     if name:
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         register_user_info(name, msg, user_id, webhook_event_id=webhook_id)
                         send_line_message(user_id, f"{name} さん、誕生日 {msg} を登録しました！")
                     else:
@@ -59,8 +62,9 @@ def receive_callback():
 
                 # 名前だけ送られたと判断
                 user_states[user_id] = {'name': msg}
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 register_user_info(msg, "", user_id, webhook_event_id=webhook_id)
-                send_line_message(user_id, f"{msg} さん、登録ありがとうございます！\n次に誕生日（〇〇〇〇年〇〇月〇〇日）を送ってください。")
+                send_line_message(user_id, f"{msg} さん、登録ありがとうございます！\n次に誕生日（○○○○年○○月○○日）を送ってください。")
 
         return "OK", 200
     except Exception as e:

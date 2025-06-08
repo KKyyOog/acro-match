@@ -33,54 +33,6 @@ def get_sheet(sheet_name):
         log_exception(e, context=f"シート取得失敗: {sheet_name}")
         raise
 
-def update_sheet_headers_for_alb(sheet, settings):
-    headers = [
-        settings.get("form_label_name", "ニックネーム"),
-        settings.get("form_label_birthday4", "誕生日4桁"),
-        settings.get("form_label_alb_experience", "経験"),
-        settings.get("form_label_alb_handslevel", "補助レベル"),
-        settings.get("form_label_area", "エリア"),
-        settings.get("form_label_available", "稼働可能日・時間"),
-        settings.get("form_label_reachtime", "連絡可能時間帯"),
-        "LIFF ID"
-    ]
-    existing_headers = sheet.row_values(1)
-    if existing_headers != headers:
-        if not existing_headers: sheet.resize(rows=1)  # データ消さないように安全に調整
-        sheet.insert_row(headers, index=1)
-
-def update_sheet_headers_for_classroom(sheet, settings):
-    headers = [
-        settings.get("form_label_classroom_name", "教室名"),
-        settings.get("form_label_classroom_location", "場所"),
-        settings.get("form_label_classroom_date", "開催日"),
-        settings.get("form_label_classroom_experience", "希望する経験"),
-        settings.get("form_label_classroom_support_level", "補助レベル"),
-        settings.get("form_label_classroom_notes", "補足・備考"),
-        "LIFF ID"
-    ]
-    existing_headers = sheet.row_values(1)
-    if existing_headers != headers:
-        if not existing_headers: sheet.resize(rows=1)  # データ消さないように安全に調整
-        sheet.insert_row(headers, index=1)
-
-    custom_fields = settings.get("custom_fields_classroom", [])
-    for field in custom_fields:
-        headers.append(field.get("label", field.get("name")))
-
-    sheet.resize(rows=1)
-    sheet.insert_row(headers, index=1)
-
-def get_webhook_id_from_liff_id(sheet, liff_id):
-    try:
-        records = sheet.get_all_records()
-        for record in records:
-            if str(record.get("LIFF ID")) == str(liff_id):
-                return record.get("webhook ID")
-    except Exception as e:
-        log_exception(e, context="LIFF ID 検索中にエラー")
-    return None
-
 def update_birthday_if_exists(liff_id, birthday, sheet_name="ユーザー情報"):
     sheet = get_sheet(sheet_name)
     records = sheet.get_all_records()
@@ -91,37 +43,38 @@ def update_birthday_if_exists(liff_id, birthday, sheet_name="ユーザー情報"
             return True
     return False
 
-def append_row_if_new_user(name, birthday, liff_id, webhook_id=None, sheet_name="ユーザー情報"):
+def append_row_if_new_user(name, birthday, liff_id, webhook_id=None, timestamp=None, sheet_name="ユーザー情報"):
     sheet = get_sheet(sheet_name)
     records = sheet.get_all_records()
 
     for idx, row in enumerate(records, start=2):
         if row.get("LIFF ID") == liff_id:
             updated = False
-            # 名前がなければ更新
             if not row.get("名前") and name:
                 name_col = list(row.keys()).index("名前") + 1
                 sheet.update_cell(idx, name_col, name)
                 updated = True
-            # 誕生日がなければ更新
             if not row.get("誕生日") and birthday:
                 bday_col = list(row.keys()).index("誕生日") + 1
                 sheet.update_cell(idx, bday_col, birthday)
                 updated = True
-            # Webhook ID の更新
             if webhook_id and not row.get("Webhook ID"):
                 hook_col = list(row.keys()).index("Webhook ID") + 1
                 sheet.update_cell(idx, hook_col, webhook_id)
                 updated = True
-            return not updated  # 更新だけで新規追加していない
+            if timestamp and "登録日時" in row and not row.get("登録日時"):
+                time_col = list(row.keys()).index("登録日時") + 1
+                sheet.update_cell(idx, time_col, timestamp)
+                updated = True
+            return not updated
 
-    # 見つからなければ新規追加
     headers = sheet.row_values(1)
     new_row_dict = {
         "名前": name,
         "誕生日": birthday,
+        "Webhook ID": webhook_id or "",
         "LIFF ID": liff_id,
-        "Webhook ID": webhook_id or ""
+        "登録日時": timestamp or ""
     }
     row = [new_row_dict.get(h, "") for h in headers]
     sheet.append_row(row)
