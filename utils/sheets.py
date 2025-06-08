@@ -4,10 +4,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from utils.logging_util import log_exception
 
-print("✅ sheets.py loaded")
-
 SCOPES = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-
 gc = None
 
 def _init_gc():
@@ -33,54 +30,58 @@ def get_sheet(sheet_name):
         log_exception(e, context=f"シート取得失敗: {sheet_name}")
         raise
 
-def update_birthday_if_exists(liff_id, birthday, sheet_name="ユーザー情報"):
-    sheet = get_sheet(sheet_name)
-    records = sheet.get_all_records()
-    for idx, row in enumerate(records, start=2):
-        if row.get("LIFF ID") == liff_id:
-            col_index = list(row.keys()).index("誕生日") + 1
-            sheet.update_cell(idx, col_index, birthday)
-            return True
-    return False
-
-def append_row_if_new_user(name, birthday, liff_id, webhook_id=None, timestamp=None, sheet_name="ユーザー情報"):
+def append_row_if_new_user(name, birthday, chat_liff_id="", app_liff_id="", timestamp=None, sheet_name="ユーザー情報"):
     sheet = get_sheet(sheet_name)
     records = sheet.get_all_records()
 
     for idx, row in enumerate(records, start=2):
-        if row.get("LIFF ID") == liff_id:
+        if row.get("チャット LIFF ID") == chat_liff_id or (name and birthday and row.get("名前") == name and row.get("誕生日") == birthday):
             updated = False
             if not row.get("名前") and name:
-                name_col = list(row.keys()).index("名前") + 1
-                sheet.update_cell(idx, name_col, name)
+                col = list(row.keys()).index("名前") + 1
+                sheet.update_cell(idx, col, name)
                 updated = True
             if not row.get("誕生日") and birthday:
-                bday_col = list(row.keys()).index("誕生日") + 1
-                sheet.update_cell(idx, bday_col, birthday)
+                col = list(row.keys()).index("誕生日") + 1
+                sheet.update_cell(idx, col, birthday)
                 updated = True
-            if webhook_id and not row.get("Webhook ID"):
-                hook_col = list(row.keys()).index("Webhook ID") + 1
-                sheet.update_cell(idx, hook_col, webhook_id)
+            if not row.get("チャット LIFF ID") and chat_liff_id:
+                col = list(row.keys()).index("チャット LIFF ID") + 1
+                sheet.update_cell(idx, col, chat_liff_id)
                 updated = True
-            if timestamp and "登録日時" in row and not row.get("登録日時"):
-                time_col = list(row.keys()).index("登録日時") + 1
-                sheet.update_cell(idx, time_col, timestamp)
+            if not row.get("アプリ LIFF ID") and app_liff_id:
+                col = list(row.keys()).index("アプリ LIFF ID") + 1
+                sheet.update_cell(idx, col, app_liff_id)
+                updated = True
+            if not row.get("登録日時") and timestamp:
+                col = list(row.keys()).index("登録日時") + 1
+                sheet.update_cell(idx, col, timestamp)
                 updated = True
             return not updated
 
     headers = sheet.row_values(1)
-    new_row_dict = {
+    new_row = {
         "名前": name,
         "誕生日": birthday,
-        "Webhook ID": webhook_id or "",
-        "LIFF ID": liff_id,
+        "チャット LIFF ID": chat_liff_id,
+        "アプリ LIFF ID": app_liff_id,
         "登録日時": timestamp or ""
     }
-    row = [new_row_dict.get(h, "") for h in headers]
-    sheet.append_row(row)
+    sheet.append_row([new_row.get(h, "") for h in headers])
     return True
 
-def update_liff_id_by_name_and_birthday4(nickname, birthday4, liff_id, sheet_name="ユーザー情報"):
+def update_app_liff_id_by_name_birthday(name, birthday, app_liff_id, sheet_name="ユーザー情報"):
+    sheet = get_sheet(sheet_name)
+    records = sheet.get_all_records()
+
+    for idx, row in enumerate(records, start=2):
+        if row.get("名前") == name and row.get("誕生日") == birthday:
+            col = list(row.keys()).index("アプリ LIFF ID") + 1
+            sheet.update_cell(idx, col, app_liff_id)
+            return True
+    return False
+
+def update_liff_id_by_name_and_birthday4(nickname, birthday4, app_liff_id, sheet_name="ユーザー情報"):
     sheet = get_sheet(sheet_name)
     records = sheet.get_all_records()
     for idx, row in enumerate(records, start=2):
@@ -88,18 +89,7 @@ def update_liff_id_by_name_and_birthday4(nickname, birthday4, liff_id, sheet_nam
             full_birthday = row.get("誕生日", "")
             digits = ''.join(filter(str.isdigit, full_birthday))
             if len(digits) >= 4 and digits[-4:] == str(birthday4):
-                col_index = list(row.keys()).index("LIFF ID") + 1
-                sheet.update_cell(idx, col_index, liff_id)
+                col_index = list(row.keys()).index("アプリ LIFF ID") + 1
+                sheet.update_cell(idx, col_index, app_liff_id)
                 return True
-    return False
-
-def update_liff_id_by_name_birthday(name, birthday, liff_id, sheet_name="ユーザー情報"):
-    sheet = get_sheet(sheet_name)
-    records = sheet.get_all_records()
-
-    for idx, row in enumerate(records, start=2):
-        if row.get("名前") == name and row.get("誕生日") == birthday:
-            col_index = list(row.keys()).index("LIFF ID") + 1
-            sheet.update_cell(idx, col_index, liff_id)
-            return True
     return False

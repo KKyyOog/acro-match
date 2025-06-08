@@ -1,21 +1,30 @@
 # blueprints/link.py
 from flask import Blueprint, request
-from utils.sheets import update_liff_id_by_name_and_birthday4
-from utils.logging_util import log_exception
+from utils.sheets import append_row_to_sheet
+from utils.user import register_user_info
+from datetime import datetime
 
-link_bp = Blueprint("link", __name__, url_prefix="/link")
+link_bp = Blueprint("link", __name__)
 
-@link_bp.route("/liff", methods=["POST"])
-def link_liff_id():
+@link_bp.route("/alb/submit", methods=["POST"])
+def submit():
     try:
         data = request.get_json()
-        name = data.get("nickname")
-        birthday4 = data.get("birthday4")
-        liff_id = data.get("liff_id")
+        print("📩 アルバイト登録データ受信:", data)
 
-        if update_liff_id_by_name_and_birthday4(name, birthday4, liff_id):
-            return "LIFF ID 登録完了", 200
-        return "該当ユーザーが見つかりません", 404
+        name = data.get("name")
+        birthday4 = data.get("birthday4")
+        user_id = data.get("userId")  # ← アプリの LIFF ID
+
+        birthday_full = f"2000年{birthday4[:2]}月{birthday4[2:]}日" if len(birthday4) == 4 else ""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        register_user_info(name, birthday_full, app_liff_id=user_id)
+
+        # ログ保存（アルバイト登録シート）
+        append_row_to_sheet("アルバイト登録", [name, birthday4, user_id, timestamp])
+        return "OK", 200
+
     except Exception as e:
-        log_exception(e, context="LIFF IDリンク処理")
-        return "Internal Server Error", 500
+        print("❌ エラー:", e)
+        return "Error", 500

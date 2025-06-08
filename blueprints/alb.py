@@ -23,7 +23,7 @@ def submit():
     try:
         settings = load_settings()
         sheet = get_sheet("アルバイト登録シート")
-        
+
         name = request.form.get("name", "")
         birthday4 = request.form.get("birthday4", "")
         experience_str = ", ".join(request.form.getlist("experience[]"))
@@ -35,7 +35,7 @@ def submit():
         custom_values = [request.form.get(field.get("name", ""), "") for field in settings.get("custom_fields", [])]
 
         birthday_full = f"2000年{birthday4[:2]}月{birthday4[2:]}日" if len(birthday4) == 4 else ""
-        register_user_info(name, birthday_full, user_id)
+        register_user_info(name, birthday_full, app_liff_id=user_id)
 
         row = [name, birthday4, experience_str, handslevel_str, area, available, reachtime] + custom_values + [user_id]
         sheet.append_row(row)
