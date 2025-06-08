@@ -70,7 +70,7 @@ def view_recruitment():
         log_exception(e, context="教室一覧表示")
         return "Internal Server Error", 500
  
-@classroom_bp.route("/classroom/interest", methods=["POST"])
+@classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
     raise Exception("🔥 強制例外：エンドポイントは呼ばれている")
 
