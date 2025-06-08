@@ -3,7 +3,8 @@ from utils.sheets import append_row_if_new_user
 from utils.sheets import (
      append_row_if_new_user,
      update_birthday_if_exists,
-     update_liff_id_in_user_map
+     update_liff_id_in_user_map,
+     update_liff_id_by_name_and_birthday4
  )
 from utils.logging_util import log_exception
 
@@ -17,5 +18,6 @@ def register_user_info(name: str, birthday: str, liff_id: str, webhook_event_id:
             if len(digits) >= 4:
                 last4 = digits[-4:]
                 update_liff_id_in_user_map(name, last4, liff_id)
+                update_liff_id_by_name_and_birthday4(name, last4, liff_id)  # ←★ここを追加
     except Exception as e:
         log_exception(e, context="register_user_info 処理")

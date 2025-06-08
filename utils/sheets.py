@@ -91,7 +91,7 @@ def update_birthday_if_exists(liff_id, birthday, sheet_name="ユーザー情報"
             return True
     return False
 
-def update_liff_id_in_user_map(name, last4, liff_id, sheet_name="ユーザー名マッピング"):
+def update_liff_id_in_user_map(name, last4, liff_id, sheet_name="ユーザー情報"):
     sheet = get_sheet(sheet_name)
     records = sheet.get_all_records()
     for idx, row in enumerate(records, start=2):
@@ -128,4 +128,17 @@ def update_liff_id_from_nickname_birthday(nickname, birthday4, liff_id, sheet_na
             col_index = list(row.keys()).index("LIFF ID") + 1
             sheet.update_cell(idx, col_index, liff_id)
             return True
+    return False
+
+def update_liff_id_by_name_and_birthday4(nickname, birthday4, liff_id, sheet_name="ユーザー情報"):
+    sheet = get_sheet(sheet_name)
+    records = sheet.get_all_records()
+    for idx, row in enumerate(records, start=2):
+        if row.get("名前") == nickname:
+            full_birthday = row.get("誕生日", "")
+            digits = ''.join(filter(str.isdigit, full_birthday))
+            if len(digits) >= 4 and digits[-4:] == str(birthday4):
+                col_index = list(row.keys()).index("LIFF ID") + 1
+                sheet.update_cell(idx, col_index, liff_id)
+                return True
     return False
