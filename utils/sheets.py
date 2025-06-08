@@ -93,3 +93,11 @@ def update_liff_id_by_name_and_birthday4(nickname, birthday4, app_liff_id, sheet
                 sheet.update_cell(idx, col_index, app_liff_id)
                 return True
     return False
+
+def get_chat_liff_id_by_app_liff_id(app_liff_id: str, user_sheet_name: str = "ユーザー情報") -> Optional[str]:
+    sheet = get_sheet(user_sheet_name)
+    records = sheet.get_all_records()
+    for row in records:
+        if row.get("アプリ LIFF ID") == app_liff_id:
+            return row.get("チャット LIFF ID")
+    return None

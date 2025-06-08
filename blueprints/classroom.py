@@ -6,6 +6,8 @@ from utils.liff import get_liff_id
 from utils.notify import send_line_message
 from utils.logging_util import log_exception
 from flask_wtf.csrf import generate_csrf
+from utils.sheets import get_sheet, get_chat_liff_id_by_app_liff_id
+from utils.notify import send_line_message
 
 classroom_bp = Blueprint("classroom", __name__, url_prefix="/classroom")
 
@@ -69,28 +71,39 @@ def view_recruitment():
     except Exception as e:
         log_exception(e, context="教室一覧表示")
         return "Internal Server Error", 500
-
+ 
 @classroom_bp.route("/interest", methods=["POST"])
-def notify_interest():
+def handle_interest():
     try:
-        data = request.get_json(force=True)
-        if not data or "row_index" not in data or "user_id" not in data:
-            return "row_index または user_id がありません", 400
+        data = request.get_json()
+        user_app_liff_id = data.get("user_id")  # LIFF 経由で取得
+        row_index = int(data.get("row_index", -1))
 
-        row_index = int(data["row_index"])
-        user_id = data["user_id"]
+        if row_index < 0 or not user_app_liff_id:
+            return {"error": "無効な入力"}, 400
 
-        sheet = get_sheet("教室登録シート")
-        row = sheet.row_values(row_index)
+        classroom_sheet = get_sheet("教室登録シート")
+        classroom_rows = classroom_sheet.get_all_values()
 
-        name, location, datetime_str, target_line_id = row[0], row[1], row[2], row[-1]
-        message = (
-            f"📢 アルバイトから興味ありの通知がありました！\n"
-            f"教室名：{name}\n場所：{location}\n日時：{datetime_str}\n連絡先：{user_id}"
-        )
+        if row_index + 1 >= len(classroom_rows):
+            return {"error": "行が存在しません"}, 404
 
-        send_line_message(target_line_id, message)
-        return "通知を送信しました！"
+        row = classroom_rows[row_index + 1]  # ヘッダーを除いた実行対象
+        classroom_name = row[0] if len(row) > 0 else "（名称不明）"
+
+        # ユーザー情報からチャット用LIFF IDを取得
+        chat_liff_id = get_chat_liff_id_by_app_liff_id(user_app_liff_id)
+        if not chat_liff_id:
+            return {"error": "ユーザーが見つかりません"}, 404
+
+        # 通知送信
+        msg = f"あなたの教室「{classroom_name}」に興味を持っている人がいます！"
+        success, err = send_line_message(chat_liff_id, msg)
+        if not success:
+            return {"error": err}, 500
+
+        return {"message": "通知送信完了"}, 200
+
     except Exception as e:
-        log_exception(e, context="興味通知")
-        return "Internal Server Error", 500
+        print("❌ 教室興味通知エラー:", e)
+        return {"error": "サーバーエラー"}, 500

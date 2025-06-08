@@ -5,6 +5,8 @@ import requests
 from dotenv import load_dotenv
 from utils.logging_util import log_exception
 from typing import Tuple, Optional
+from utils.sheets import get_chat_liff_id_by_app_liff_id
+from utils.notify import send_line_message
 
 load_dotenv()
 
@@ -38,3 +40,13 @@ def send_line_message(user_id: str, message_text: str) -> Tuple[bool, Optional[s
     except Exception as e:
         log_exception(e, context="send_line_message 内で例外")
         return False, str(e)
+
+def notify_interested_classroom(app_liff_id: str, classroom_name: str):
+    chat_liff_id = get_chat_liff_id_by_app_liff_id(app_liff_id)
+    if chat_liff_id:
+        msg = f"あなたの教室「{classroom_name}」に興味を持っている人がいます！"
+        success, error = send_line_message(chat_liff_id, msg)
+        if not success:
+            print("❌ 通知失敗:", error)
+    else:
+        print("⚠️ チャットIDが見つかりませんでした")
