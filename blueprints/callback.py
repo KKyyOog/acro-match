@@ -8,17 +8,20 @@ from utils.logging_util import log_exception
 
 callback_bp = Blueprint("callback", __name__)
 
+# 🧠 ユーザーごとの一時状態保存（名前）
+user_states = {}  # user_id → {'name': str}
+
 @callback_bp.route("/callback", methods=["POST"])
 def handle_callback():
     data = request.get_json(silent=True) or {}
-    print("\U0001F4E9 Webhook受信:", data)
+    print("📩 Webhook受信:", data)
     return "OK", 200
 
 @callback_bp.route("", methods=["POST"])
 def receive_callback():
     try:
         data = request.get_json(force=True)
-        print("\U0001F4E9 Webhook受信:", data)
+        print("📩 Webhook受信:", data)
         events = data.get("events", [])
 
         for event in events:
@@ -31,8 +34,9 @@ def receive_callback():
                 send_line_message(user_id, "友だち追加ありがとうございます！\nまずお名前を送ってください。その後、生年月日（〇〇〇〇年〇〇月〇〇日）を送ってください。")
 
             elif event.get("type") == "message":
-                msg = event.get("message", {}).get("text", "")
+                msg = event.get("message", {}).get("text", "").strip()
 
+                # 名前\n誕生日 の同時送信パターン
                 if '\n' in msg:
                     parts = msg.split('\n')
                     if len(parts) >= 2:
@@ -40,14 +44,23 @@ def receive_callback():
                         if re.match(r"^\d{4}年\d{1,2}月\d{1,2}日$", bday):
                             register_user_info(name, bday, user_id, webhook_event_id=webhook_id)
                             send_line_message(user_id, f"{name} さん、登録ありがとうございます！\n生年月日 {bday} も登録しました。")
+                            user_states[user_id] = {'name': name}  # 名前も保存しておく
                             continue
 
+                # 生年月日単独パターン
                 if re.match(r"^\d{4}年\d{1,2}月\d{1,2}日$", msg):
-                    updated = update_birthday_if_exists(user_id, msg)
-                    send_line_message(user_id, f"生年月日 {msg} を登録しました。" if updated else "先にお名前を送ってください。")
-                else:
-                    register_user_info(msg, "", user_id, webhook_event_id=webhook_id)
-                    send_line_message(user_id, f"{msg} さん、登録ありがとうございます！")
+                    name = user_states.get(user_id, {}).get("name")
+                    if name:
+                        register_user_info(name, msg, user_id, webhook_event_id=webhook_id)
+                        send_line_message(user_id, f"{name} さん、誕生日 {msg} を登録しました！")
+                    else:
+                        send_line_message(user_id, "先にお名前を送ってください。")
+                    continue
+
+                # 名前だけ送られたと判断
+                user_states[user_id] = {'name': msg}
+                register_user_info(msg, "", user_id, webhook_event_id=webhook_id)
+                send_line_message(user_id, f"{msg} さん、登録ありがとうございます！\n次に誕生日（〇〇〇〇年〇〇月〇〇日）を送ってください。")
 
         return "OK", 200
     except Exception as e:
@@ -57,7 +70,7 @@ def receive_callback():
 @callback_bp.route("/interest", methods=["POST"])
 def receive_interest():
     try:
-        print("\U0001F4E8 興味あり受信:", request.json)
+        print("📨 興味あり受信:", request.json)
         return jsonify({"message": "受信OK"}), 200
     except Exception as e:
         log_exception(e, context="Callback /interest 処理")
