@@ -1,6 +1,6 @@
 # blueprints/classroom.py
 from flask import Blueprint, request, render_template, jsonify, redirect, url_for
-from utils.sheets import get_sheet, update_sheet_headers_for_classroom
+from utils.sheets import get_sheet
 from utils.settings import load_settings
 from utils.liff import get_liff_id
 from utils.notify import send_line_message

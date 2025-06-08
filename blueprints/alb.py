@@ -1,6 +1,6 @@
 # blueprints/alb.py
 from flask import Blueprint, request, render_template, redirect
-from utils.sheets import get_sheet, update_sheet_headers_for_alb
+from utils.sheets import get_sheet
 from utils.settings import load_settings
 from utils.liff import get_liff_id
 from utils.user import register_user_info
