@@ -1,7 +1,7 @@
 # blueprints/link.py
 from flask import Blueprint, request
-from utils.sheets import append_row_to_sheet
 from utils.user import register_user_info
+from utils.sheets import append_row_if_new_user
 from datetime import datetime
 
 link_bp = Blueprint("link", __name__)
@@ -22,7 +22,7 @@ def submit():
         register_user_info(name, birthday_full, app_liff_id=user_id)
 
         # ログ保存（アルバイト登録シート）
-        append_row_to_sheet("アルバイト登録", [name, birthday4, user_id, timestamp])
+        append_row_if_new_user("アルバイト登録", [name, birthday4, user_id, timestamp])
         return "OK", 200
 
     except Exception as e:
