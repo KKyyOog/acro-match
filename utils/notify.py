@@ -3,7 +3,6 @@
 import os
 import requests
 from dotenv import load_dotenv
-from utils.sheets import get_webhook_id_from_liff_id
 from utils.logging_util import log_exception
 from typing import Tuple, Optional
 
@@ -39,17 +38,3 @@ def send_line_message(user_id: str, message_text: str) -> Tuple[bool, Optional[s
     except Exception as e:
         log_exception(e, context="send_line_message 内で例外")
         return False, str(e)
-
-def notify_classroom_of_interest(liff_id: str, interested_user_name: str = "誰かが") -> bool:
-    try:
-        webhook_id = get_webhook_id_from_liff_id(liff_id)
-        if webhook_id:
-            message = f"{interested_user_name} あなたの募集に興味を持っています！"
-            success, _ = send_line_message(webhook_id, message)
-            return success
-        else:
-            print("❌ 対応するWebhook IDが見つかりません")
-            return False
-    except Exception as e:
-        log_exception(e, context="教室側通知処理")
-        return False
