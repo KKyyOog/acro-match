@@ -74,21 +74,31 @@ def view_recruitment():
 def handle_interest():
     try:
         data = request.get_json(force=True)
-        row_index = int(data.get("row_index", -1))
+        print("📩 受信データ:", data)
+
+        row_index_raw = data.get("row_index")
+        print("🔍 row_index(raw):", row_index_raw)
+
+        try:
+            row_index = int(row_index_raw)
+        except (TypeError, ValueError):
+            print("❌ row_index を int に変換できません")
+            return {"error": "無効な row_index"}, 400
 
         if row_index < 0:
-            return {"error": "row_indexが不正"}, 400
+            print("❌ row_index が 0 未満です")
+            return {"error": "row_index が不正"}, 400
 
-        # 教室登録シートの取得
         sheet = get_sheet("教室登録シート")
         rows = sheet.get_all_values()
+        print("📊 シート取得成功。行数:", len(rows))
 
         if row_index + 1 >= len(rows):
+            print("❌ 該当行が存在しません")
             return {"error": "行が存在しません"}, 404
 
-        # 行の取得（1行目はヘッダーなので +1）
         classroom_row = rows[row_index + 1]
-        print("📚 興味ありが押された教室の情報:", classroom_row)
+        print("📚 押された教室の行:", classroom_row)
 
         return {"message": "ログ出力完了"}, 200
 
