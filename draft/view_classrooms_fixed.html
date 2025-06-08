@@ -33,7 +33,7 @@
       }
     }
 
-    async function submitForm(rowIndex) {
+   async function submitForm(rowIndex) {
   if (!window.userId) {
     alert("ユーザー情報の取得に失敗しました");
     return;
@@ -43,22 +43,26 @@
     row_index: rowIndex,
     user_id: window.userId
   };
-  console.log("📤 送信ペイロード:", payload);  // ← 必ず確認
+  console.log("📤 送信ペイロード:", payload);  // デバッグ用ログ
 
   try {
-    await fetch("/classroom/interest", {
+    const response = await fetch("/classroom/interest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        row_index: 5,
-        user_id: "12345"
-      })
-    })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error("Error:", error));
+      body: JSON.stringify(payload)  // 動的に生成したペイロードを送信
+    });
+
+    if (!response.ok) {
+      console.error("サーバーエラー:", response.statusText);
+      alert("送信に失敗しました。");
+      return;
+    }
+
+    const data = await response.json();
+    console.log("📩 サーバーからの応答:", data);
+    alert("興味ありが記録されました！");
   } catch (error) {
     console.error("送信エラー:", error);
     alert("送信中にエラーが発生しました。");
