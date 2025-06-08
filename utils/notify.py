@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from utils.logging_util import log_exception
 from typing import Tuple, Optional
 from utils.sheets import get_chat_liff_id_by_app_liff_id
-from utils.notify import send_line_message
 
 load_dotenv()
 
