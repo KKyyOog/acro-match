@@ -43,7 +43,7 @@ def receive_callback():
                         name, bday = parts[0].strip(), parts[1].strip()
                         if re.match(r"^\d{4}年\d{1,2}月\d{1,2}日$", bday):
                             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                            register_user_info(name, bday, user_id)
+                            register_user_info(name, bday, liff_id=user_id)
                             send_line_message(user_id, f"{name} さん、登録ありがとうございます！\n生年月日 {bday} も登録しました。")
                             user_states[user_id] = {'name': name}
                             continue
@@ -53,7 +53,7 @@ def receive_callback():
                     name = user_states.get(user_id, {}).get("name")
                     if name:
                         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        register_user_info(name, msg, user_id, webhook_event_id=webhook_id)
+                        register_user_info(name, msg, liff_id=user_id)
                         send_line_message(user_id, f"{name} さん、誕生日 {msg} を登録しました！")
                     else:
                         send_line_message(user_id, "先にお名前を送ってください。")
@@ -62,7 +62,7 @@ def receive_callback():
                 # 名前だけ送られたと判断
                 user_states[user_id] = {'name': msg}
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                register_user_info(msg, "", user_id, webhook_event_id=webhook_id)
+                register_user_info(msg, "", liff_id=user_id)
                 send_line_message(user_id, f"{msg} さん、登録ありがとうございます！\n次に誕生日（○○○○年○○月○○日）を送ってください。")
 
         return "OK", 200
