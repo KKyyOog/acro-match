@@ -22,8 +22,7 @@ def submit():
     try:
         settings = load_settings()
         sheet = get_sheet("教室登録シート")
-        update_sheet_headers_for_classroom(sheet, settings)
-
+        
         name = request.form.get("name")
         location = request.form.get("location")
         date = request.form.get("date")

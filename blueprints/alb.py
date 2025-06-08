@@ -23,8 +23,7 @@ def submit():
     try:
         settings = load_settings()
         sheet = get_sheet("アルバイト登録シート")
-        update_sheet_headers_for_alb(sheet, settings)
-
+        
         name = request.form.get("name", "")
         birthday4 = request.form.get("birthday4", "")
         experience_str = ", ".join(request.form.getlist("experience[]"))
