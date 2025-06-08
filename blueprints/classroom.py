@@ -74,7 +74,7 @@ def view_recruitment():
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
     try:
-        data = request.get_json()
+        data = request.get_json(force=True)
         user_app_liff_id = data.get("user_id")  # LIFF 経由で取得
         row_index = int(data.get("row_index", -1))
 

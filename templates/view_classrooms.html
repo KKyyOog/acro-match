@@ -64,6 +64,7 @@
         row_index: rowIndex,
         user_id: window.userId
       };
+      console.log("送信データ:", payload);
 
       try {
         await fetch("/classroom/interest", {
@@ -75,6 +76,8 @@
       } catch (err) {
         alert("送信エラー：" + err);
       }
+      console.log("LIFF userId:", window.userId);
+
     }
 
     function showNotes(notes) {
