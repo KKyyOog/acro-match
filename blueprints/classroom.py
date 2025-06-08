@@ -79,6 +79,7 @@ def handle_interest():
 
         # ★ 行の色を変更（視覚マーカー）
         highlight_classroom_row(row_index)
+        print("📩 /classroom/interest 受信:", data)
 
         if row_index < 0 or not user_app_liff_id:
             return {"error": "無効な入力"}, 400
@@ -108,3 +109,4 @@ def handle_interest():
     except Exception as e:
         print("❌ 教室興味通知エラー:", e)
         return {"error": "サーバーエラー"}, 500
+    
