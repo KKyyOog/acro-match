@@ -72,5 +72,10 @@ def view_recruitment():
  
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
-    raise Exception("🔥 強制例外：エンドポイントは呼ばれている")
+    data = request.get_json(force=True)
+    print("📩 受信データ:", data)
 
+    row_index_raw = data.get("row_index")
+    user_id = data.get("user_id")
+    print("🔎 row_index:", row_index_raw)
+    print("🔎 user_id:", user_id)
