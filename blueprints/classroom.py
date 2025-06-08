@@ -73,35 +73,44 @@ def view_recruitment():
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
     try:
-        data = request.get_json(force=True)
+        try:
+            data = request.get_json(force=True)
+        except Exception as json_error:
+            print("❌ JSONパース失敗:", json_error)
+            return {"error": "無効なJSON"}, 400
+
         print("📩 受信データ:", data)
+
+        if not data:
+            print("❌ データが空です")
+            return {"error": "データ未送信"}, 400
 
         row_index_raw = data.get("row_index")
         print("🔍 row_index(raw):", row_index_raw)
 
         try:
             row_index = int(row_index_raw)
-        except (TypeError, ValueError):
-            print("❌ row_index を int に変換できません")
-            return {"error": "無効な row_index"}, 400
+        except Exception as e:
+            print("❌ row_index 整数化エラー:", e)
+            return {"error": "row_index 不正"}, 400
 
         if row_index < 0:
-            print("❌ row_index が 0 未満です")
-            return {"error": "row_index が不正"}, 400
+            print("❌ row_index が負数")
+            return {"error": "不正な行番号"}, 400
 
         sheet = get_sheet("教室登録シート")
         rows = sheet.get_all_values()
-        print("📊 シート取得成功。行数:", len(rows))
+        print("📊 シート取得完了。行数:", len(rows))
 
         if row_index + 1 >= len(rows):
-            print("❌ 該当行が存在しません")
-            return {"error": "行が存在しません"}, 404
+            print("❌ 行が存在しません:", row_index + 1)
+            return {"error": "行なし"}, 404
 
         classroom_row = rows[row_index + 1]
-        print("📚 押された教室の行:", classroom_row)
+        print("📚 教室行:", classroom_row)
 
-        return {"message": "ログ出力完了"}, 200
+        return {"message": "OK"}, 200
 
     except Exception as e:
         print("❌ 処理エラー:", e)
-        return {"error": "サーバーエラー"}, 500
+        return {"error": str(e)}, 500
