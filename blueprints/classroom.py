@@ -74,15 +74,22 @@ def view_recruitment():
 def handle_interest():
     try:
         data = request.get_json(force=True)
+        print("📩 受信データ:", data)
         user_app_liff_id = data.get("user_id")  # LIFF 経由で取得
-        row_index = int(data.get("row_index", -1))
+        row_index = data.get("row_index", -1)
+        print("🧩 row_index raw:", row_index)
+        print("🧩 user_id:", user_app_liff_id)
 
-        # ★ 行の色を変更（視覚マーカー）
-        highlight_classroom_row(row_index)
-        print("📩 /classroom/interest 受信:", data)
-
+        try:
+            row_index = int(row_index)
+        except (TypeError, ValueError):
+            return {"error": "row_index が整数でない"}, 400
+        
         if row_index < 0 or not user_app_liff_id:
             return {"error": "無効な入力"}, 400
+        
+        # ここで実際の処理（色変更など）を行う
+        highlight_classroom_row(row_index)
 
         classroom_sheet = get_sheet("教室登録シート")
         classroom_rows = classroom_sheet.get_all_values()
