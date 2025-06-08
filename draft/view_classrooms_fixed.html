@@ -52,18 +52,18 @@
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        row_index: "2",
-        user_id: "Uxxxxxxxxxxxxxxxxxx"
+        row_index: 5,
+        user_id: "12345"
       })
     })
-    .then(response => response.text())
-    .then(data => console.log(data));
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error("Error:", error));
   } catch (error) {
-    console.error("Error:", error);
+    console.error("送信エラー:", error);
+    alert("送信中にエラーが発生しました。");
   }
 }
-
-
     window.onload = initializeLIFF;
   </script>
 </head>

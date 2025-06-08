@@ -77,9 +77,15 @@ def handle_interest():
         print("📩 受信データ:", data)
 
         # Validate required fields
-        if not data or "row_index" not in data or "user_id" not in data:
-            print("❌ 必須データが不足しています:", data)
+        if not data:
+            print("❌ データが空です")
             return "Bad Request: Missing required data", 400
+        if "row_index" not in data:
+            print("❌ 'row_index' が不足しています")
+            return "Bad Request: Missing 'row_index'", 400
+        if "user_id" not in data:
+            print("❌ 'user_id' が不足しています")
+            return "Bad Request: Missing 'user_id'", 400
 
         row_index_raw = data.get("row_index")
         user_id = data.get("user_id")
