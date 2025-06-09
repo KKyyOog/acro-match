@@ -73,40 +73,24 @@ def view_recruitment():
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
     try:
+        # クライアントから送信されたデータを取得
         data = request.get_json(force=True)
         print("📩 サーバーが受信したデータ:", data)
 
-        # Validate required fields
-        if not data:
-            print("❌ データが空です")
-            return "Bad Request: Missing required data", 400
-        if "row_index" not in data:
-            print("❌ 'row_index' が不足しています")
-            return "Bad Request: Missing 'row_index'", 400
-
-        # Validate row_index
-        row_index_raw = data.get("row_index")
-        print("🔎 row_index_raw:", row_index_raw)  # デバッグ用ログ
-        try:
-            row_index = int(row_index_raw)
-        except ValueError:
-            print("❌ 'row_index' の形式が不正です:", row_index_raw)
-            return "Bad Request: Invalid 'row_index'", 400
+        # row_index を取得
+        row_index = int(data.get("row_index", 0))  # デフォルト値を 0 に設定
+        print("🔎 row_index:", row_index)
 
         # スプレッドシートから該当行を取得
         sheet = get_sheet("教室登録シート")
         rows = sheet.get_all_values()
-        if row_index < 2 or row_index > len(rows):
-            print("❌ 'row_index' が範囲外です:", row_index)
-            return "Bad Request: 'row_index' out of range", 400
 
-        # 該当行のデータをログに出力
-        row_data = rows[row_index - 1]  # スプレッドシートの行は1ベース
+        # 該当行のデータを取得してログに出力
+        row_data = rows[row_index - 1]  # 1ベースのインデックス
         print("🔎 該当行のデータ:", row_data)
 
         return "Row data logged successfully", 200
     except Exception as e:
         import traceback
-        print("❌ 予期しないエラーが発生しました:", traceback.format_exc())
-        log_exception(e, context="興味あり処理")
+        print("❌ エラーが発生しました:", traceback.format_exc())
         return "Internal Server Error", 500
