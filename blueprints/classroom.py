@@ -83,31 +83,30 @@ def handle_interest():
         if "row_index" not in data:
             print("❌ 'row_index' が不足しています")
             return "Bad Request: Missing 'row_index'", 400
-        if "user_id" not in data:
-            print("❌ 'user_id' が不足しています")
-            return "Bad Request: Missing 'user_id'", 400
 
         # Validate row_index
         row_index_raw = data.get("row_index")
+        print("🔎 row_index_raw:", row_index_raw)  # デバッグ用ログ
         try:
-            row_index = int(row_index_raw)  # 修正済み
+            row_index = int(row_index_raw)
         except ValueError:
             print("❌ 'row_index' の形式が不正です:", row_index_raw)
             return "Bad Request: Invalid 'row_index'", 400
 
-        # Validate user_id
-        user_id = data.get("user_id")
-        if not isinstance(user_id, str):
-            print("❌ 'user_id' の形式が不正です:", user_id)
-            return "Bad Request: Invalid 'user_id'", 400
+        # スプレッドシートから該当行を取得
+        sheet = get_sheet("教室登録シート")
+        rows = sheet.get_all_values()
+        if row_index < 2 or row_index > len(rows):
+            print("❌ 'row_index' が範囲外です:", row_index)
+            return "Bad Request: 'row_index' out of range", 400
 
-        print("🔎 row_index:", row_index)
-        print("🔎 user_id:", user_id)
+        # 該当行のデータをログに出力
+        row_data = rows[row_index - 1]  # スプレッドシートの行は1ベース
+        print("🔎 該当行のデータ:", row_data)
 
-        # Process the interest (e.g., send a notification)
-        # Add your logic here...
-
-        return "Interest recorded successfully", 200
+        return "Row data logged successfully", 200
     except Exception as e:
+        import traceback
+        print("❌ 予期しないエラーが発生しました:", traceback.format_exc())
         log_exception(e, context="興味あり処理")
         return "Internal Server Error", 500
