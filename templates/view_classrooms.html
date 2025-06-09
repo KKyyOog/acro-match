@@ -93,10 +93,8 @@
   <table>
     <thead>
   <tr>
-    {% for col_index, header in headers %}
-      {% if col_index not in [6] %}
-        <th>{{ header }}</th>
-      {% endif %}
+    {% for header in headers %}
+      <th>{{ header }}</th>
     {% endfor %}
     <th>興味あり</th>
   </tr>
@@ -104,10 +102,8 @@
 <tbody>
   {% for row_index, row in rows %}
   <tr>
-    {% for col_index, cell in row %}
-      {% if col_index not in [6] %}
-        <td>{{ cell }}</td>
-      {% endif %}
+    {% for cell in row %}
+      <td>{{ cell }}</td>
     {% endfor %}
     <td>
       <button onclick="submitInterest({{ row_index }})">興味あり</button>

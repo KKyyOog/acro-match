@@ -59,17 +59,34 @@ def submit():
 @classroom_bp.route("/recruit", methods=["GET"])
 def view_recruitment():
     try:
+        # 設定データとLIFF IDを取得
         settings = load_settings()
         liff_id = get_liff_id("recruit")
+
+        # スプレッドシートからデータを取得
         sheet = get_sheet("教室登録シート")
-        headers = sheet.row_values(1)
-        rows = sheet.get_all_values()[1:]
-        indexed_rows = [(i + 2, row) for i, row in enumerate(rows)]
-        return render_template("view_classrooms.html", headers=headers, rows=indexed_rows, settings=settings, liff_id=liff_id)
+        headers = sheet.row_values(1)  # ヘッダー行を取得
+        rows = sheet.get_all_values()[1:]  # データ行を取得（ヘッダーを除く）
+
+        # 各行にインデックスを付与
+        indexed_rows = [(i + 1, row) for i, row in enumerate(rows)]
+
+        # テンプレートに渡すコンテキストを準備
+        context = {
+            "headers": headers,  # ヘッダー
+            "rows": indexed_rows,  # インデックス付きデータ行
+            "settings": settings,  # 設定データ
+            "liff_id": liff_id,  # LIFF ID
+        }
+
+        # テンプレートをレンダリング
+        return render_template("view_classrooms.html", **context)
+
     except Exception as e:
+        # エラーをログに記録し、500エラーを返す
         log_exception(e, context="教室一覧表示")
         return "Internal Server Error", 500
- 
+    
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
     try:
