@@ -88,7 +88,17 @@ def handle_interest():
             return "Bad Request: Missing 'user_id'", 400
 
         row_index_raw = data.get("row_index")
+        try:
+            ow_index = int(row_index_raw)
+        except ValueError:
+            print("❌ 'row_index' の形式が不正です:", row_index_raw)
+            return "Bad Request: Invalid 'row_index'", 400
+        
         user_id = data.get("user_id")
+        if not isinstance(user_id, str) or not user_id.startswith("U"):
+            print("❌ 'user_id' の形式が不正です:", user_id)
+            return "Bad Request: Invalid 'user_id'", 400
+        
         print("🔎 row_index:", row_index_raw)
         print("🔎 user_id:", user_id)
 
