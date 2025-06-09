@@ -96,6 +96,9 @@
   <table>
     <thead>
       <tr>
+        {% for header in headers %}
+          <th>{{ header }}</th>
+        {% endfor %}
         <th>教室名/イベント名</th>
         <th>場所</th>
         <th>募集日時</th>
@@ -105,33 +108,51 @@
       </tr>
     </thead>
     <tbody>
-      {% for row_index, row in rows %}
-        <tr>
-          <td>
-            <span class="clickable" onclick="showNotes(`{{ row[5]|e }}`)">
-              {{ row[0] }}
-            </span>
-          </td>
-          <td>{{ row[1] }}</td>
-          <td>
-            {% set parts = row[2].split("T") %}
-            {% if parts|length == 2 %}
-              {% set date_parts = parts[0].split("-") %}
-              {% set time_parts = parts[1].split(":") %}
-              <div>{{ date_parts[1]|int }}/{{ date_parts[2]|int }}</div>
-              <div>{{ time_parts[0]|int }}:{{ "%02d"|format(time_parts[1]|int) }}</div>
-            {% else %}
-              {{ row[2] }}
-            {% endif %}
-          </td>
-          <td>{{ row[3] }}</td>
-          <td>{{ row[4] }}</td>
-          <td>
-            <button type="button" onclick="submitForm({{ row_index }})">興味あり</button>
-          </td>
-        </tr>
+    {% for row_index, row in rows %}
+    <tr>
+      {% for cell in row %}
+      <td>{{ cell }}</td>
       {% endfor %}
-    </tbody>
-  </table>
+      <td>
+        <button onclick="submitInterest({{ row_index }})">興味あり</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  async function submitInterest(rowIndex) {
+    const payload = {
+      row_index: rowIndex,
+      user_id: "Ued80139e5f210e65dec4656ab07fcc55" // 仮のユーザーID
+    };
+
+    console.log("📤 送信ペイロード:", payload);
+
+    try {
+      const response = await fetch("/classroom/interest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        console.error("❌ サーバーエラー:", response.statusText);
+        alert("送信に失敗しました。");
+        return;
+      }
+
+      const data = await response.text();
+      console.log("📩 サーバーからの応答:", data);
+      alert("興味ありが記録されました！");
+    } catch (error) {
+      console.error("❌ 送信エラー:", error);
+      alert("送信中にエラーが発生しました。");
+    }
+  }
+</script>
 </body>
 </html>
