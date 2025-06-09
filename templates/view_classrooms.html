@@ -39,56 +39,55 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     const LIFF_ID = "{{ liff_id | safe }}";
-
-    async function initializeLIFF() {
-      try {
-        await liff.init({ liffId: LIFF_ID });
-        if (!liff.isLoggedIn()) {
-          liff.login();
-          return;
-        }
-        window.userId = (await liff.getProfile()).userId;
-      } catch (error) {
-        console.error("LIFF initialization failed:", error);
-        alert("LINEログインに失敗しました。");
+  async function initializeLIFF() {
+    try {
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
       }
+      window.userId = (await liff.getProfile()).userId;
+    } catch (error) {
+      console.error("LIFF initialization failed:", error);
+      alert("LINEログインに失敗しました。");
     }
+  }
 
-    async function submitForm(rowIndex) {
-      if (!window.userId) {
-        alert("ユーザー情報の取得に失敗しました");
+  async function submitInterest(rowIndex) {
+    const payload = {
+      row_index: rowIndex,
+      user_id: window.userId // LIFF から取得したユーザーIDを使用
+    };
+
+    console.log("📤 送信ペイロード:", payload);
+
+    try {
+      const response = await fetch("/classroom/interest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ サーバーエラー:", response.statusText, errorText);
+        alert(`送信に失敗しました: ${errorText}`);
         return;
       }
 
-      const payload = {
-        row_index: rowIndex,
-        user_id: window.userId
-      };
-      console.log("送信データ:", payload);
-
-      try {
-        await fetch("/classroom/interest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        alert("通知を送りました！");
-      } catch (err) {
-        alert("送信エラー：" + err);
-      }
-      console.log("LIFF userId:", window.userId);
+      const data = await response.text();
+      console.log("📩 サーバーからの応答:", data);
+      alert("興味ありが記録されました！");
+    } catch (error) {
+      console.error("❌ 送信エラー:", error);
+      alert("送信中にエラーが発生しました。");
     }
+  }
 
-    function showNotes(notes) {
-      if (notes && notes.trim()) {
-        alert("📌 その他のご要望:\n\n" + notes);
-      } else {
-        alert("特記事項はありません。");
-      }
-    }
-
-    window.onload = initializeLIFF;
-  </script>
+  window.onload = initializeLIFF;
+</script>
 </head>
 <body>
   <h1>{{ settings.classroom_title | default("教室登録一覧") }}</h1>
@@ -120,39 +119,5 @@
     {% endfor %}
   </tbody>
 </table>
-
-<script>
-  async function submitInterest(rowIndex) {
-    const payload = {
-      row_index: rowIndex,
-      user_id: "Ued80139e5f210e65dec4656ab07fcc55" // 仮のユーザーID
-    };
-
-    console.log("📤 送信ペイロード:", payload);
-
-    try {
-      const response = await fetch("/classroom/interest", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        console.error("❌ サーバーエラー:", response.statusText);
-        alert("送信に失敗しました。");
-        return;
-      }
-
-      const data = await response.text();
-      console.log("📩 サーバーからの応答:", data);
-      alert("興味ありが記録されました！");
-    } catch (error) {
-      console.error("❌ 送信エラー:", error);
-      alert("送信中にエラーが発生しました。");
-    }
-  }
-</script>
 </body>
 </html>

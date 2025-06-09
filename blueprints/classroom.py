@@ -75,10 +75,20 @@ def handle_interest():
     try:
         # クライアントから送信されたデータを取得
         data = request.get_json(force=True)
+        if data is None:
+            print("❌ JSON データが解析できませんでした")
+            return "Bad Request: Invalid JSON", 400
+
         print("📩 サーバーが受信したデータ:", data)
 
         # row_index を取得
-        row_index = int(data.get("row_index", 0))  # デフォルト値を 0 に設定
+        row_index_raw = data.get("row_index")
+        try:
+            row_index = int(row_index_raw)
+        except ValueError:
+            print("❌ 'row_index' の形式が不正です:", row_index_raw)
+            return "Bad Request: Invalid 'row_index'", 400
+
         print(f"🔔 興味ボタンが押されました！ row_index: {row_index}")
 
         return "Interest button clicked", 200
