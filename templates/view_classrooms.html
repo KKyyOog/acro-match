@@ -33,83 +33,138 @@
       text-align: center;
       margin-bottom: 1.5rem;
     }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 2rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    .popup-close {
+      display: block;
+      margin-top: 1rem;
+      text-align: center;
+      color: #007bff;
+      cursor: pointer;
+    }
   </style>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-  const LIFF_ID = "{{ liff_id | safe }}";
-  const csrfToken = "{{ csrf_token() }}";
-
-  async function initializeLIFF() {
-    try {
-      await liff.init({ liffId: LIFF_ID });
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
+    async function initializeLIFF() {
+      try {
+        const liffId = document.getElementById("liff-container").dataset.liffId; // LIFF IDを非表示で取得
+        await liff.init({ liffId: liffId });
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+        window.userId = (await liff.getProfile()).userId;
+      } catch (error) {
+        console.error("LIFF initialization failed:", error);
+        alert("LINEログインに失敗しました。");
       }
-      window.userId = (await liff.getProfile()).userId;
-    } catch (error) {
-      console.error("LIFF initialization failed:", error);
-      alert("LINEログインに失敗しました。");
     }
-  }
 
-  async function submitInterest(rowIndex) {
-    const payload = {
-      row_index: rowIndex,
-      user_id: window.userId
-    };
+    async function submitInterest(rowIndex) {
+      const csrfToken = document.getElementById("liff-container").dataset.csrfToken; // CSRFトークンを非表示で取得
+      const payload = {
+        row_index: rowIndex,
+        user_id: window.userId
+      };
 
-    try {
-      const response = await fetch("/classroom/interest", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken
-        },
-        body: JSON.stringify(payload)
-      });
+      try {
+        const response = await fetch("/classroom/interest", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+          },
+          body: JSON.stringify(payload)
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        alert(`送信に失敗しました: ${errorText}`);
-        return;
+        if (!response.ok) {
+          const errorText = await response.text();
+          alert(`送信に失敗しました: ${errorText}`);
+          return;
+        }
+
+        const data = await response.text();
+        alert("興味ありが記録されました！");
+      } catch (error) {
+        console.error("送信エラー:", error);
+        alert("送信中にエラーが発生しました。");
       }
-
-      const data = await response.text();
-      alert("興味ありが記録されました！");
-    } catch (error) {
-      console.error("送信エラー:", error);
-      alert("送信中にエラーが発生しました。");
     }
-  }
 
-  window.onload = initializeLIFF;
+    function showPopup(classroomName, details) {
+      const popup = document.getElementById("popup");
+      const overlay = document.getElementById("popup-overlay");
+      popup.querySelector(".popup-content").innerText = `教室名: ${classroomName}\n詳細: ${details}`;
+      popup.style.display = "block";
+      overlay.style.display = "block";
+    }
+
+    function closePopup() {
+      const popup = document.getElementById("popup");
+      const overlay = document.getElementById("popup-overlay");
+      popup.style.display = "none";
+      overlay.style.display = "none";
+    }
+
+    window.onload = initializeLIFF;
   </script>
 </head>
 <body>
+  <div id="liff-container" data-liff-id="{{ liff_id | safe }}" data-csrf-token="{{ csrf_token() }}"></div>
+
   <h1>{{ settings.classroom_title | default("教室登録一覧") }}</h1>
 
   <table>
     <thead>
-  <tr>
-    {% for header in headers %}
-      <th>{{ header }}</th>
-    {% endfor %}
-    <th>興味あり</th>
-  </tr>
-</thead>
-<tbody>
-  {% for row_index, row in rows %}
-  <tr>
-    {% for cell in row %}
-      <td>{{ cell }}</td>
-    {% endfor %}
-    <td>
-      <button onclick="submitInterest({{ row_index }})">興味あり</button>
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
+      <tr>
+        {% for header in headers %}
+          <th>{{ header }}</th>
+        {% endfor %}
+        <th>興味あり</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row_index, row in rows %}
+      <tr>
+        {% for col_index, cell in row %}
+          {% if col_index == 0 %}
+            <td class="clickable" onclick="showPopup('{{ cell }}', '詳細情報をここに追加')">{{ cell }}</td>
+          {% else %}
+            <td>{{ cell }}</td>
+          {% endif %}
+        {% endfor %}
+        <td>
+          <button onclick="submitInterest({{ row_index }})">興味あり</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
+  <div id="popup" class="popup">
+    <div class="popup-content"></div>
+    <span class="popup-close" onclick="closePopup()">閉じる</span>
+  </div>
 </body>
 </html>
