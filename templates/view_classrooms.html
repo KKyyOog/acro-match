@@ -38,7 +38,7 @@
   <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-    const LIFF_ID = "{{ liff_id | safe }}";
+  const LIFF_ID = "{{ liff_id | safe }}";
   async function initializeLIFF() {
     try {
       await liff.init({ liffId: LIFF_ID });
@@ -86,8 +86,16 @@
     }
   }
 
+  function showNotes(notes) {
+    if (notes && notes.trim()) {
+      alert("📌 その他のご要望:\n\n" + notes);
+    } else {
+      alert("特記事項はありません。");
+    }
+  }
+
   window.onload = initializeLIFF;
-</script>
+  </script>
 </head>
 <body>
   <h1>{{ settings.classroom_title | default("教室登録一覧") }}</h1>
