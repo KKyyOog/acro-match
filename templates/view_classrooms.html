@@ -92,29 +92,28 @@
 
   <table>
     <thead>
-      <tr>
-        {% for col_index, header in headers | enumerate %}
-          {% if col_index not in [6] %}
-            <th>{{ header }}</th>
-          {% endif %}
-        {% endfor %}
-        <th>興味あり</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for row_index, row in rows %}
-    <tr>
-      {% for col_index, cell in row | enumerate %}
-        {% if col_index not in [6] %}
-          <td>{{ cell }}</td>
-        {% endif %}
-      {% endfor %}
-      <td>
-        <button onclick="submitInterest({{ row_index|tojson }})">興味あり</button>
-      </td>
-    </tr>
+  <tr>
+    {% for col_index, header in headers %}
+      {% if col_index not in [6] %}
+        <th>{{ header }}</th>
+      {% endif %}
     {% endfor %}
-    </tbody>
-  </table>
+    <th>興味あり</th>
+  </tr>
+</thead>
+<tbody>
+  {% for row_index, row in rows %}
+  <tr>
+    {% for col_index, cell in row %}
+      {% if col_index not in [6] %}
+        <td>{{ cell }}</td>
+      {% endif %}
+    {% endfor %}
+    <td>
+      <button onclick="submitInterest({{ row_index }})">興味あり</button>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
 </body>
 </html>
