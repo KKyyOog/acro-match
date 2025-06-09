@@ -80,16 +80,8 @@ def handle_interest():
         # row_index を取得
         row_index = int(data.get("row_index", 0))  # デフォルト値を 0 に設定
         print("🔎 row_index:", row_index)
-
-        # スプレッドシートから該当行を取得
-        sheet = get_sheet("教室登録シート")
-        rows = sheet.get_all_values()
-
-        # 該当行のデータを取得してログに出力
-        row_data = rows[row_index - 1]  # 1ベースのインデックス
-        print("🔎 該当行のデータ:", row_data)
-
-        return "Row data logged successfully", 200
+        
+        return "Success", 200
     except Exception as e:
         import traceback
         print("❌ エラーが発生しました:", traceback.format_exc())
