@@ -79,9 +79,9 @@ def handle_interest():
 
         # row_index を取得
         row_index = int(data.get("row_index", 0))  # デフォルト値を 0 に設定
-        print("🔎 row_index:", row_index)
-        
-        return "Success", 200
+        print(f"🔔 興味ボタンが押されました！ row_index: {row_index}")
+
+        return "Interest button clicked", 200
     except Exception as e:
         import traceback
         print("❌ エラーが発生しました:", traceback.format_exc())
