@@ -74,7 +74,7 @@ def view_recruitment():
 def handle_interest():
     try:
         data = request.get_json(force=True)
-        print("📩 受信データ:", data)
+        print("📩 サーバーが受信したデータ:", data)
 
         # Validate required fields
         if not data:
@@ -87,19 +87,21 @@ def handle_interest():
             print("❌ 'user_id' が不足しています")
             return "Bad Request: Missing 'user_id'", 400
 
+        # Validate row_index
         row_index_raw = data.get("row_index")
         try:
-            ow_index = int(row_index_raw)
+            row_index = int(row_index_raw)  # 修正済み
         except ValueError:
             print("❌ 'row_index' の形式が不正です:", row_index_raw)
             return "Bad Request: Invalid 'row_index'", 400
-        
+
+        # Validate user_id
         user_id = data.get("user_id")
-        if not isinstance(user_id, str) or not user_id.startswith("U"):
+        if not isinstance(user_id, str):
             print("❌ 'user_id' の形式が不正です:", user_id)
             return "Bad Request: Invalid 'user_id'", 400
-        
-        print("🔎 row_index:", row_index_raw)
+
+        print("🔎 row_index:", row_index)
         print("🔎 user_id:", user_id)
 
         # Process the interest (e.g., send a notification)
