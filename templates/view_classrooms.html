@@ -117,13 +117,13 @@
     }
 
     function showPopup(classroomName, details) {
-      const popup = document.getElementById("popup");
-      const overlay = document.getElementById("popup-overlay");
-      popup.querySelector(".popup-content").innerText = `教室名: ${classroomName}\n詳細: ${details}`;
-      popup.style.display = "block";
-      overlay.style.display = "block";
-    }
-
+        const popup = document.getElementById("popup");
+        const overlay = document.getElementById("popup-overlay");
+        popup.querySelector(".popup-content").innerText = `教室名: ${classroomName}\nその他自由記述: ${details}`;
+        popup.style.display = "block";
+        overlay.style.display = "block";
+      }
+      
     function closePopup() {
       const popup = document.getElementById("popup");
       const overlay = document.getElementById("popup-overlay");
@@ -153,7 +153,10 @@
     <tbody>
       {% for row_index, row_data in rows %}
       <tr>
-        {% for cell in row_data %}
+        <td class="clickable" onclick="showPopup('{{ row_data[0] }}', '{{ row_data[-1] }}')">
+          {{ row_data[0] }}
+        </td>
+        {% for cell in row_data[1:-1] %} <!-- その他自由記述を除外 -->
         <td>{{ cell }}</td>
         {% endfor %}
         <td>
