@@ -56,19 +56,24 @@ def view_recruitment():
         if not headers or not rows:
             log_error("スプレッドシートのデータが空です")
             return "No data available", 404
-        
-        # LIFF ID列を除外（最後の列を削除）
-        headers = headers[:-1]  # ヘッダーからLIFF ID列を削除
-        rows = [row[:-1] for row in rows]  # 各行からLIFF ID列を削除
+
+        # ヘッダーからLIFF ID列を削除
+        headers = headers[:-1]  # 最後の列（LIFF ID）を削除
+
+        # 各行から「その他自由記述」を分離し、ポップアップ用に保持
+        processed_rows = []
+        for row in rows:
+            popup_data = row[-2]  # その他自由記述（最後から2番目の列）
+            row_data = row[:-2]  # 表に表示するデータ（その他自由記述とLIFF IDを除外）
+            processed_rows.append((popup_data, row_data))
 
         # 各行にインデックスを付与
-        indexed_rows = [(i + 1, row) for i, row in enumerate(rows)]
+        indexed_rows = [(i + 1, popup_data, row_data) for i, (popup_data, row_data) in enumerate(processed_rows)]
         log_info(f"教室募集一覧を取得しました: {indexed_rows}")
 
-        # テンプレートに渡すコンテキストを準備
         context = {
-            "headers": headers,
-            "rows": indexed_rows,  # インデックス付きの形式をそのまま渡す
+            "headers": headers[:-1],  # 表に表示するヘッダー（その他自由記述を除外）
+            "rows": indexed_rows,
             "settings": settings,
             "liff_id": liff_id,
         }
