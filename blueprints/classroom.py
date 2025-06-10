@@ -56,6 +56,10 @@ def view_recruitment():
         if not headers or not rows:
             log_error("スプレッドシートのデータが空です")
             return "No data available", 404
+        
+        # LIFF ID列を除外（最後の列を削除）
+        headers = headers[:-1]  # ヘッダーからLIFF ID列を削除
+        rows = [row[:-1] for row in rows]  # 各行からLIFF ID列を削除
 
         # 各行にインデックスを付与
         indexed_rows = [(i + 1, row) for i, row in enumerate(rows)]
@@ -75,14 +79,6 @@ def view_recruitment():
         log_exception(e, context="教室募集一覧表示")
         return "Internal Server Error", 500
     
-@classroom_bp.route('/get-liff-id', methods=['GET'])
-def get_liff_id(context=None):
-    if context == "recruit":
-        return "YOUR_LIFF_ID_FOR_RECRUIT"  # recruit用のLIFF ID
-    elif context == "classroom":
-        return "YOUR_LIFF_ID_FOR_CLASSROOM"  # classroom用のLIFF ID
-    return "DEFAULT_LIFF_ID"  # デフォルトのLIFF ID
-
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
     try:

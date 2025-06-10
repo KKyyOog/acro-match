@@ -68,7 +68,7 @@
     async function initializeLIFF() {
         try {
           // サーバーからLIFF IDを取得
-          const liffId = await fetch('/classroom/get-liff-id')
+          const liffId = await fetch("/liff-id")
             .then(response => response.text());
 
           // LIFFを初期化
