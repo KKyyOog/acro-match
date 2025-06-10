@@ -74,7 +74,6 @@ def view_recruitment():
     except Exception as e:
         log_exception(e, context="教室募集一覧表示")
         return "Internal Server Error", 500
-    
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
     try:

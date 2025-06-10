@@ -144,9 +144,9 @@
       </tr>
     </thead>
     <tbody>
-      {% for row_index, row_data in rows %}
+      {% for row_index, in rows %}
       <tr>
-        {% for col_index, cell in row_data %}
+        {% for col_index, cell in %}
         {% if col_index == 0 %}
         <!-- 教室名をクリックするとポップアップ表示 -->
         <td class="clickable" onclick="showPopup('{{ cell }}', '{{ row_data[5] }}')">{{ cell }}</td>
