@@ -152,7 +152,7 @@
     <tbody>
       {% for row_index, popup_data, row_data in rows %}
       <tr>
-        <td class="clickable" onclick="showPopup('{{ row_data[0] }}', '{{ row_data[-1] }}')">
+        <td class="clickable" onclick="showPopup('{{ row_data[0] }}', '{{ popup_data }}')">
           {{ row_data[0] }}
         </td>
         {% for cell in row_data[1:] %} <!-- その他自由記述を除外 -->
