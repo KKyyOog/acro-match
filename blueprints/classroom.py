@@ -62,7 +62,12 @@ def view_recruitment():
         log_info(f"教室募集一覧を取得しました: {indexed_rows}")
 
         # テンプレートに渡すコンテキストを準備
-        rows = [row for _, row in indexed_rows]    
+        context = {
+            "headers": headers,
+            "rows": indexed_rows,
+            "settings": settings,
+            "liff_id": liff_id,
+        }
 
         return render_template("view_classrooms.html", **context)
 
@@ -108,7 +113,7 @@ def handle_interest():
         user_sheet = get_sheet("ユーザー情報")
         user_rows = user_sheet.get_all_values()[1:]  # ヘッダーを除いたデータ行を取得
 
-        log_info(f"ユーザー情報のデータ: {user_rows}")
+        log_info(f"ユーザー情報シートのデータ: {user_rows}")
 
         matching_row = None
         for user_row in user_rows:
