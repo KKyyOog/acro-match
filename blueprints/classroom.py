@@ -62,12 +62,13 @@ def view_recruitment():
         log_info(f"教室募集一覧を取得しました: {indexed_rows}")
 
         # テンプレートに渡すコンテキストを準備
+        rows = [row for _, row in indexed_rows]
         context = {
             "headers": headers,
-            "rows": indexed_rows,
+            "rows": rows,
             "settings": settings,
             "liff_id": liff_id,
-        }
+        }     
 
         return render_template("view_classrooms.html", **context)
 
