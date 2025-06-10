@@ -155,7 +155,7 @@
         <td class="clickable" onclick="showPopup('{{ row_data[0] }}', '{{ row_data[-1] }}')">
           {{ row_data[0] }}
         </td>
-        {% for cell in row_data[1:-1] %} <!-- その他自由記述を除外 -->
+        {% for cell in row_data[1:-2] %} <!-- その他自由記述を除外 -->
         <td>{{ cell }}</td>
         {% endfor %}
         <td>

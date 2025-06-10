@@ -58,8 +58,8 @@ def view_recruitment():
             return "No data available", 404
         
         # LIFF ID列を除外（最後の列を削除）
-        headers = headers[:-2]  # ヘッダーからLIFF ID列を削除
-        rows = [row[:-2] for row in rows]  # 各行からLIFF ID列を削除
+        headers = headers[:-1]  # ヘッダーからLIFF ID列を削除
+        rows = [row[:-1] for row in rows]  # 各行からLIFF ID列を削除
 
         # 各行にインデックスを付与
         indexed_rows = [(i + 1, row) for i, row in enumerate(rows)]
