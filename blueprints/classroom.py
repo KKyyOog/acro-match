@@ -104,21 +104,28 @@ def handle_interest():
 
         selected_row = rows[row_index - 1]  # row_index は 1ベースなので -1 する
         classroom_name = selected_row[0]  # 教室名は行の最初の列にあると仮定
-        liff_id = selected_row[-1]  # LIFF ID は行の最後の列にあると仮定
+        app_liff_id = selected_row[-1]  # アプリ LIFF ID は行の最後の列にあると仮定
 
         log_info(f"選択された教室名: {classroom_name}")
-        log_info(f"選択された LIFF ID: {liff_id}")
+        log_info(f"選択されたアプリ LIFF ID: {app_liff_id}")
 
-        # 興味ボタン通知メッセージを送信
-        message = f"教室名: {classroom_name} に興味があると通知されました！"
-        try:
-            send_line_message(liff_id, message)  # LINE Notify API を使用してメッセージを送信
-            log_info(f"通知メッセージを送信しました: {message}")
-        except Exception as notify_error:
-            log_exception(notify_error, context="通知メッセージ送信")
-            return "Internal Server Error: Failed to send notification", 500
+        # ユーザー情報シートから該当する行を探す
+        user_sheet = get_sheet("ユーザー情報シート")
+        user_rows = user_sheet.get_all_values()[1:]  # ヘッダーを除いたデータ行を取得
 
-        return jsonify({"classroom_name": classroom_name, "liff_id": liff_id}), 200
+        chat_liff_id = None
+        for user_row in user_rows:
+            if user_row[0] == app_liff_id:  # アプリ LIFF ID が一致する行を探す
+                chat_liff_id = user_row[1]  # 該当行のチャット LIFF ID を取得
+                break
+
+        if chat_liff_id:
+            log_info(f"対応するチャット LIFF ID: {chat_liff_id}")
+        else:
+            log_error(f"アプリ LIFF ID に対応するチャット LIFF ID が見つかりません: {app_liff_id}")
+            return "Bad Request: No matching chat LIFF ID found", 400
+
+        return jsonify({"classroom_name": classroom_name, "chat_liff_id": chat_liff_id}), 200
 
     except Exception as e:
         log_exception(e, context="興味ありリクエスト処理")
