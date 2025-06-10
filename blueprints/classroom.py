@@ -118,7 +118,7 @@ def handle_interest():
         matching_row = None
         for user_row in user_rows:
             log_info(f"チェック中の行: {user_row}")
-            if user_row[0] == app_liff_id:  # アプリ LIFF ID が一致する行を探す
+            if user_row[3] == app_liff_id:  # アプリ LIFF ID が一致する行を探す
                 matching_row = user_row
                 break
 
