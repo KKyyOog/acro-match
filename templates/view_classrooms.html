@@ -146,15 +146,15 @@
 <tbody>
   {% for row_index, row in rows %}
   <tr>
-    {% for col_index, cell in row %}
-      {% if loop.index0 == 0 %} <!-- col_index を loop.index0 に変更 -->
+    {% for cell in row %}
+      {% if loop.index0 == 0 %}
         <td class="clickable" onclick="showPopup('{{ cell }}', '詳細情報をここに追加')">{{ cell }}</td>
       {% else %}
         <td>{{ cell }}</td>
       {% endif %}
     {% endfor %}
     <td>
-      <button onclick="submitInterest({{ row_index }})">興味あり</button>
+      <button onclick="submitInterest('{{ row_index }}')">興味あり</button>
     </td>
   </tr>
   {% endfor %}
