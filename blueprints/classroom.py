@@ -110,7 +110,7 @@ def handle_interest():
         log_info(f"選択されたアプリ LIFF ID: {app_liff_id}")
 
         # ユーザー情報シートから該当する行を探す
-        user_sheet = get_sheet("ユーザー情報シート")
+        user_sheet = get_sheet("ユーザー情報")
         user_rows = user_sheet.get_all_values()[1:]  # ヘッダーを除いたデータ行を取得
 
         chat_liff_id = None
