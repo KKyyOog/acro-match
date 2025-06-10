@@ -113,7 +113,7 @@ def handle_interest():
         user_sheet = get_sheet("ユーザー情報")
         user_rows = user_sheet.get_all_values()[1:]  # ヘッダーを除いたデータ行を取得
 
-        log_info(f"ユーザー情報シートのデータ: {user_rows}")
+        log_info(f"ユーザー情報のデータ: {user_rows}")
 
         matching_row = None
         for user_row in user_rows:
@@ -124,11 +124,22 @@ def handle_interest():
 
         if matching_row:
             log_info(f"対応するユーザー情報行: {matching_row}")
+            chat_liff_id = matching_row[2]  # 該当行のチャット LIFF ID を取得
+
+            # 通知メッセージを送信
+            message = f"教室名: {classroom_name} に興味があると通知されました！"
+            try:
+                send_line_message(chat_liff_id, message)  # LINE Notify API を使用してメッセージを送信
+                log_info(f"通知メッセージを送信しました: {message}")
+            except Exception as notify_error:
+                log_exception(notify_error, context="通知メッセージ送信")
+                return "Internal Server Error: Failed to send notification", 500
+
             return jsonify({"classroom_name": classroom_name, "matching_row": matching_row}), 200
         else:
             log_error(f"アプリ LIFF ID '{app_liff_id}' に対応する行が見つかりません。ユーザー情報シートを確認してください。")
             return "Bad Request: No matching row found", 400
-    
+
     except Exception as e:
         log_exception(e, context="興味ありリクエスト処理")
         return "Internal Server Error", 500
