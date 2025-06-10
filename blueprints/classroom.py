@@ -46,7 +46,7 @@ def view_recruitment():
     try:
         # 設定データと LIFF ID を取得
         settings = load_settings()
-        liff_id = get_liff_id("recruit")
+        liff_id = get_liff_id()
 
         # スプレッドシートからデータを取得
         sheet = get_sheet("教室登録シート")
