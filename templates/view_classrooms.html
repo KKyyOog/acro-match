@@ -67,13 +67,20 @@
   <script>
     async function initializeLIFF() {
         try {
-          const liffId = await fetch('/classroom/get-liff-id') // サーバーからLIFF IDを取得
+          // サーバーからLIFF IDを取得
+          const liffId = await fetch('/classroom/get-liff-id')
             .then(response => response.text());
+
+          // LIFFを初期化
           await liff.init({ liffId: liffId });
+
+          // LINEログインが必要な場合
           if (!liff.isLoggedIn()) {
             liff.login();
             return;
           }
+
+          // ユーザーIDを取得
           window.userId = (await liff.getProfile()).userId;
         } catch (error) {
           console.error("LIFF initialization failed:", error);

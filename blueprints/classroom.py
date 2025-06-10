@@ -76,13 +76,9 @@ def view_recruitment():
         return "Internal Server Error", 500
     
 @classroom_bp.route('/get-liff-id', methods=['GET'])
-def get_liff_id(context=None):
-    log_info(f"get_liff_id called with context: {context}")
-    if context == "recruit":
-        return "YOUR_LIFF_ID_FOR_RECRUIT"
-    elif context == "classroom":
-        return "YOUR_LIFF_ID_FOR_CLASSROOM"
-    return "DEFAULT_LIFF_ID"
+def get_liff_id():
+    return "YOUR_LIFF_ID_FOR_RECRUIT"  # 必要に応じて環境変数や設定ファイルから取得
+
 @classroom_bp.route("/interest", methods=["POST"])
 def handle_interest():
     try:
