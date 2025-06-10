@@ -94,8 +94,20 @@ def handle_interest():
             log_error(f"'row_index' の形式が不正です: {row_index_raw}")
             return "Bad Request: Invalid 'row_index'", 400
 
-        log_info(f"興味ボタンが押されました！ row_index: {row_index}")
-        return "Interest button clicked", 200
+        # スプレッドシートから該当する行を取得
+        sheet = get_sheet("教室登録シート")
+        rows = sheet.get_all_values()[1:]  # ヘッダーを除いたデータ行を取得
+
+        if row_index < 1 or row_index > len(rows):
+            log_error(f"row_index が範囲外です: {row_index}")
+            return "Bad Request: 'row_index' out of range", 400
+
+        selected_row = rows[row_index - 1]  # row_index は 1ベースなので -1 する
+        classroom_name = selected_row[0]  # 教室名は行の最初の列にあると仮定
+
+        log_info(f"選択された教室名: {classroom_name}")
+
+        return f"教室名: {classroom_name}", 200
 
     except Exception as e:
         log_exception(e, context="興味ありリクエスト処理")
