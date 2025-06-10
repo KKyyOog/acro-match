@@ -124,6 +124,11 @@ def handle_interest():
 
         if matching_row:
             log_info(f"対応するユーザー情報行: {matching_row}")
+            return jsonify({"classroom_name": classroom_name, "matching_row": matching_row}), 200
         else:
             log_error(f"アプリ LIFF ID '{app_liff_id}' に対応する行が見つかりません。ユーザー情報シートを確認してください。")
             return "Bad Request: No matching row found", 400
+    
+    except Exception as e:
+        log_exception(e, context="興味ありリクエスト処理")
+        return "Internal Server Error", 500
