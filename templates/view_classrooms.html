@@ -144,7 +144,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for row_data in rows %}
+      {% for row_index, row_data in rows %}
       <tr>
         {% for col_index, cell in row_data %}
         {% if col_index == 0 %}
@@ -155,11 +155,11 @@
         {% endif %}
         {% endfor %}
         <td>
-          <button onclick="submitInterest('{{ loop.index }}')">興味あり</button>
+          <button onclick="submitInterest('{{ row_index }}')">興味あり</button>
         </td>
       </tr>
       {% endfor %}
-    </tbody>
+      </tbody>
 </table>
 
   <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
