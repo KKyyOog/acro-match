@@ -113,19 +113,19 @@ def handle_interest():
         user_sheet = get_sheet("ユーザー情報")
         user_rows = user_sheet.get_all_values()[1:]  # ヘッダーを除いたデータ行を取得
 
-        chat_liff_id = None
+        matching_row = None
         for user_row in user_rows:
             if user_row[0] == app_liff_id:  # アプリ LIFF ID が一致する行を探す
-                chat_liff_id = user_row[1]  # 該当行のチャット LIFF ID を取得
+                matching_row = user_row
                 break
 
-        if chat_liff_id:
-            log_info(f"対応するチャット LIFF ID: {chat_liff_id}")
+        if matching_row:
+            log_info(f"対応するユーザー情報行: {matching_row}")
         else:
-            log_error(f"アプリ LIFF ID に対応するチャット LIFF ID が見つかりません: {app_liff_id}")
-            return "Bad Request: No matching chat LIFF ID found", 400
+            log_error(f"アプリ LIFF ID に対応する行が見つかりません: {app_liff_id}")
+            return "Bad Request: No matching row found", 400
 
-        return jsonify({"classroom_name": classroom_name, "chat_liff_id": chat_liff_id}), 200
+        return jsonify({"classroom_name": classroom_name, "matching_row": matching_row}), 200
 
     except Exception as e:
         log_exception(e, context="興味ありリクエスト処理")
