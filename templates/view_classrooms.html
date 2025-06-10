@@ -67,7 +67,7 @@
   <script>
     async function initializeLIFF() {
         try {
-          const liffId = await fetch('/get-liff-id') // サーバーからLIFF IDを取得
+          const liffId = await fetch('/classroom/get-liff-id') // サーバーからLIFF IDを取得
             .then(response => response.text());
           await liff.init({ liffId: liffId });
           if (!liff.isLoggedIn()) {
