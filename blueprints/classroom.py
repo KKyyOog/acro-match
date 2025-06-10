@@ -104,10 +104,19 @@ def handle_interest():
 
         selected_row = rows[row_index - 1]  # row_index は 1ベースなので -1 する
         classroom_name = selected_row[0]  # 教室名は行の最初の列にあると仮定
-        liff_id = selected_row[-1]
+        liff_id = selected_row[-1]  # LIFF ID は行の最後の列にあると仮定
 
         log_info(f"選択された教室名: {classroom_name}")
         log_info(f"選択された LIFF ID: {liff_id}")
+
+        # 興味ボタン通知メッセージを送信
+        message = f"教室名: {classroom_name} に興味があると通知されました！"
+        try:
+            send_line_message(liff_id, message)  # LINE Notify API を使用してメッセージを送信
+            log_info(f"通知メッセージを送信しました: {message}")
+        except Exception as notify_error:
+            log_exception(notify_error, context="通知メッセージ送信")
+            return "Internal Server Error: Failed to send notification", 500
 
         return jsonify({"classroom_name": classroom_name, "liff_id": liff_id}), 200
 
