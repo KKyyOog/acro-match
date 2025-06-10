@@ -66,20 +66,20 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     async function initializeLIFF() {
-      try {
-        const liffId = document.getElementById("liff-container").dataset.liffId; // LIFF IDを非表示で取得
-        await liff.init({ liffId: liffId });
-        if (!liff.isLoggedIn()) {
-          liff.login();
-          return;
+        try {
+          const liffId = await fetch('/get-liff-id') // サーバーからLIFF IDを取得
+            .then(response => response.text());
+          await liff.init({ liffId: liffId });
+          if (!liff.isLoggedIn()) {
+            liff.login();
+            return;
+          }
+          window.userId = (await liff.getProfile()).userId;
+        } catch (error) {
+          console.error("LIFF initialization failed:", error);
+          alert("LINEログインに失敗しました。");
         }
-        window.userId = (await liff.getProfile()).userId;
-      } catch (error) {
-        console.error("LIFF initialization failed:", error);
-        alert("LINEログインに失敗しました。");
       }
-    }
-
     async function submitInterest(rowIndex) {
       const csrfToken = document.getElementById("liff-container").dataset.csrfToken; // CSRFトークンを非表示で取得
       const payload = {
@@ -131,6 +131,8 @@
 </head>
 <body>
   <div id="liff-container" data-liff-id="{{ liff_id | safe }}" data-csrf-token="{{ csrf_token() }}"></div>
+  <div id="liff-container" style="display: none;" data-liff-id="{{ liff_id | safe }}"
+    data-csrf-token="{{ csrf_token() }}"></div>
 
   <h1>{{ settings.classroom_title | default("教室登録一覧") }}</h1>
 
@@ -156,8 +158,6 @@
       {% endfor %}
       </tbody>
   </table>
-  <div id="liff-container" style="display: none;" data-liff-id="{{ liff_id | safe }}" data-csrf-token="{{ csrf_token() }}"></div>
-
   <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
   <div id="popup" class="popup">
     <div class="popup-content"></div>
