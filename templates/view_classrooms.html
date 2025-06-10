@@ -144,22 +144,22 @@
       </tr>
     </thead>
     <tbody>
-      {% for row_index, row_data in rows %}
+      {% for row_data in rows %}
       <tr>
         {% for col_index, cell in row_data %}
-          {% if loop.index0 == 0 %}
+        {% if col_index == 0 %}
         <!-- 教室名をクリックするとポップアップ表示 -->
-            <td class="clickable" onclick="showPopup('{{ cell }}', '{{ row_data[5] }}')">{{ cell }}</td>
-          {% elif col_index != 6 %} <!-- liff_id を完全に非表示 -->
-            <td>{{ cell }}</td>
-          {% endif %}
+        <td class="clickable" onclick="showPopup('{{ cell }}', '{{ row_data[5] }}')">{{ cell }}</td>
+        {% elif col_index != 6 %} <!-- liff_id を完全に非表示 -->
+        <td>{{ cell }}</td>
+        {% endif %}
         {% endfor %}
         <td>
-          <button onclick="submitInterest('{{ row_index }}')">興味あり</button>
+          <button onclick="submitInterest('{{ loop.index }}')">興味あり</button>
         </td>
       </tr>
       {% endfor %}
-    </tbody>  
+    </tbody>
 </table>
 
   <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
