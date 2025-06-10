@@ -156,6 +156,7 @@
       {% endfor %}
       </tbody>
   </table>
+  <div id="liff-container" style="display: none;" data-liff-id="{{ liff_id | safe }}" data-csrf-token="{{ csrf_token() }}"></div>
 
   <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
   <div id="popup" class="popup">
