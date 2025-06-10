@@ -143,13 +143,13 @@
         <th>興味あり</th>
       </tr>
     </thead>
-    <tbody>
-  {% for row_index, row in rows %}
+  <tbody>
+  {% for row_index, row_data in rows %}
   <tr>
-    {% for col_index, cell in row %}
+    {% for col_index, cell in row_data %}
       {% if col_index == 0 %}
         <!-- 教室名をクリックするとポップアップ表示 -->
-        <td class="clickable" onclick="showPopup('{{ cell }}', '{{ row[5] }}')">{{ cell }}</td>
+        <td class="clickable" onclick="showPopup('{{ cell }}', '{{ row_data[5] }}')">{{ cell }}</td>
       {% elif col_index != 6 %} <!-- liff_id を完全に非表示 -->
         <td>{{ cell }}</td>
       {% endif %}
