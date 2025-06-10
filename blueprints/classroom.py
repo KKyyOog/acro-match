@@ -113,8 +113,11 @@ def handle_interest():
         user_sheet = get_sheet("ユーザー情報")
         user_rows = user_sheet.get_all_values()[1:]  # ヘッダーを除いたデータ行を取得
 
+        log_info(f"ユーザー情報シートのデータ: {user_rows}")
+
         matching_row = None
         for user_row in user_rows:
+            log_info(f"チェック中の行: {user_row}")
             if user_row[0] == app_liff_id:  # アプリ LIFF ID が一致する行を探す
                 matching_row = user_row
                 break
@@ -122,11 +125,5 @@ def handle_interest():
         if matching_row:
             log_info(f"対応するユーザー情報行: {matching_row}")
         else:
-            log_error(f"アプリ LIFF ID に対応する行が見つかりません: {app_liff_id}")
+            log_error(f"アプリ LIFF ID '{app_liff_id}' に対応する行が見つかりません。ユーザー情報シートを確認してください。")
             return "Bad Request: No matching row found", 400
-
-        return jsonify({"classroom_name": classroom_name, "matching_row": matching_row}), 200
-
-    except Exception as e:
-        log_exception(e, context="興味ありリクエスト処理")
-        return "Internal Server Error", 500
