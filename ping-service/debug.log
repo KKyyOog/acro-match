@@ -1,0 +1,13 @@
+2025-06-17 10:00:37,461 - DEBUG - Test logger initialized
+2025-06-17 10:00:37,465 - DEBUG - Invalid host response: Ping exception for host: Hostname is empty
+2025-06-17 10:00:37,600 - DEBUG - Ping failure response: Ping failed for host invalid.host: 
+2025-06-17 10:00:37,729 - DEBUG - Ping success response: 
+Pinging google.com [142.251.222.46] with 32 bytes of data:
+Reply from 142.251.222.46: bytes=32 time=51ms TTL=119
+
+Ping statistics for 142.251.222.46:
+    Packets: Sent = 1, Received = 1, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 51ms, Maximum = 51ms, Average = 51ms
+
+2025-06-17 10:00:41,763 - DEBUG - Ping timeout response: Ping timeout for host 10.255.255.1
