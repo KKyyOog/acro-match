@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: acro_match
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+
+  - type: web
+    name: match-form
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+
+  - type: worker
+    name: acro-match-monitor
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python monitor_service.py
+    rootDir: ping-service/src
+    plan: free
