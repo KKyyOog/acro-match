@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: acro-monitor
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python monitor_acro_match.py
-    workingDirectory: ping-service
-    autoDeploy: true
-    plan : free
