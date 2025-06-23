@@ -1,0 +1,5 @@
+2025-06-18 13:19:25,627 - DEBUG - Logger 'ping_service_logger' initialized
+2025-06-18 13:19:25,628 - DEBUG - PingService logger initialized
+2025-06-18 13:19:25,628 - INFO - This is a test log entry from ping_service.py
+2025-06-18 13:19:25,637 - INFO - Sending HTTP GET request to https://acro-match.onrender.com with timeout=5
+2025-06-18 13:19:30,939 - ERROR - HTTP timeout for https://acro-match.onrender.com
