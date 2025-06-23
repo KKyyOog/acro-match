@@ -4,6 +4,6 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python monitor_acro_match.py
-    workingDirectory: correct-folder
+    workingDirectory: ping-service
     autoDeploy: true
     plan : free
