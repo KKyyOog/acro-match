@@ -13,10 +13,16 @@ services:
     startCommand: gunicorn app:app
     plan: free
 
-  - type: worker
+  - type: web
     name: acro-match-monitor
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python monitor_service.py
     rootDir: ping-service/src
     plan: free
+
+cron:
+  - name: acro-monitor-cron
+    env: python
+    schedule: "@every 5m"
+    command: python ping-service/src/monitor_service.py
