@@ -21,8 +21,9 @@ services:
     rootDir: ping-service/src
     plan: free
 
-cron:
-  - name: acro-monitor-cron
-    env: python
-    schedule: "@every 5m"
-    command: python ping-service/src/monitor_service.py
+  - type: cron
+    name: keep-alive-ping
+    schedule: "*/5 * * * *"  # Every 5 min
+    runtime: python
+    buildCommand: ""
+    startCommand: python src/keep_alive.py  

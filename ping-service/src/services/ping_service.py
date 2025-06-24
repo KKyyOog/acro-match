@@ -1,14 +1,25 @@
+# services/ping_service.py
+
 import subprocess
 import requests
+import time
 from services.alert_service import AlertService
 from utils.logger import setup_logger
+import os
 
 logger = setup_logger("ping_service_logger")
-
 logger.debug("PingService logger initialized")
 logger.info("This is a test log entry from ping_service.py")
 
 class PingService:
+    def __init__(self):
+        self.alert_service = AlertService(
+            sender_email=os.environ.get("SMTP_USER"),
+            sender_password=os.environ.get("SMTP_PASSWORD"),
+            smtp_server=os.environ.get("SMTP_SERVER", "smtp.gmail.com"),
+            smtp_port=int(os.environ.get("SMTP_PORT", 587))
+        )
+
     def ping(self, host, timeout=5, count=1):
         if not host.strip():
             logger.error("Ping exception for host: Hostname is empty")
@@ -45,22 +56,39 @@ class PingService:
             logger.error(f"General exception caught -> {e}")
             return f"Ping exception for host {host}: {e}"
 
-    def check_http(self, url, timeout=5):
-        try:
-            logger.info(f"Sending HTTP GET request to {url} with timeout={timeout}")
-            response = requests.get(url, timeout=timeout)
-            if response.status_code == 200:
-                logger.info(f"HTTP request succeeded for {url}")
-                return f"Server is reachable: {url}"
-            else:
-                logger.warning(f"HTTP request failed with status code {response.status_code} for {url}")
-                AlertService().send_alert(f"Server returned status code {response.status_code}: {url}")
-                return f"Server returned status code {response.status_code}: {url}"
-        except requests.exceptions.Timeout:
-            logger.error(f"HTTP timeout for {url}")
-            AlertService().send_alert(f"HTTP timeout for server: {url}")
-            return f"HTTP timeout for server: {url}"
-        except requests.exceptions.RequestException as e:
-            logger.error(f"HTTP exception caught -> {e}")
-            AlertService().send_alert(f"HTTP exception for server {url}: {e}")
-            return f"HTTP exception for server {url}: {e}"
+    def check_http(self, url, timeout=5, retries=3):
+        for attempt in range(1, retries + 1):
+            try:
+                logger.info(f"Attempt {attempt}: Sending HTTP GET request to {url} with timeout={timeout}")
+                response = requests.get(url, timeout=timeout)
+                if response.status_code == 200:
+                    logger.info(f"HTTP request succeeded for {url}")
+                    return f"Server is reachable: {url}"
+                else:
+                    logger.warning(f"HTTP request failed with status code {response.status_code} for {url}")
+                    if attempt == retries:
+                        self.alert_service.send_email(
+                            recipient_email="recipient_email@example.com",
+                            subject="HTTP Status Code Alert",
+                            message=f"Server returned status code {response.status_code}: {url}"
+                        )
+                    return f"Server returned status code {response.status_code}: {url}"
+            except requests.exceptions.Timeout:
+                logger.error(f"Attempt {attempt}: HTTP timeout for {url}")
+                if attempt == retries:
+                    self.alert_service.send_email(
+                        recipient_email="recipient_email@example.com",
+                        subject="HTTP Timeout Alert",
+                        message=f"HTTP timeout for server: {url}"
+                    )
+                    return f"HTTP timeout for server: {url}"
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Attempt {attempt}: HTTP exception caught -> {e}")
+                if attempt == retries:
+                    self.alert_service.send_email(
+                        recipient_email="recipient_email@example.com",
+                        subject="HTTP Exception Alert",
+                        message=f"HTTP exception for server {url}: {e}"
+                    )
+                    return f"HTTP exception for server {url}: {e}"
+            time.sleep(2 ** (attempt - 1))

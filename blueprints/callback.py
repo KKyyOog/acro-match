@@ -30,7 +30,7 @@ def receive_callback():
                 continue
 
             if event.get("type") == "follow":
-                send_line_message(user_id, "友だち追加ありがとうございます！\nまずお名前を送ってください。その後、生年月日（○○○○年○○月○○日）を送ってください。")
+                send_line_message(user_id, "まずお名前を送ってください。その後、生年月日（○○○○年○○月○○日）を送ってください。")
 
             elif event.get("type") == "message":
                 msg = event.get("message", {}).get("text", "").strip()
