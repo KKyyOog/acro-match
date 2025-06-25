@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger("app")
 
 # Add src to path to import services
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
 
 from services.monitor_service import MonitorService
 
