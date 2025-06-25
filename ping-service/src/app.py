@@ -8,6 +8,7 @@ import sys
 import requests
 import logging
 from datetime import datetime
+from collections import deque
 
 # Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -26,7 +27,8 @@ status_data = {
     "last_ping": None,
     "keep_alive_url": None,
     "keep_alive_status": None,
-    "monitor_interval": None
+    "monitor_interval": None,
+    "recent_logs": deque(maxlen=3)
 }
 
 # Optional auth token to protect /status
@@ -41,15 +43,20 @@ def keep_alive_loop():
     while True:
         try:
             response = requests.get(target_url, timeout=10)
-            status_data["last_ping"] = datetime.utcnow().isoformat()
+            timestamp = datetime.utcnow().isoformat()
+            status_data["last_ping"] = timestamp
             status_data["keep_alive_status"] = response.status_code
+            status_data["recent_logs"].appendleft({"time": timestamp, "status": response.status_code})
             if response.status_code == 200:
                 logger.info(f"Keep-alive ping succeeded: {response.status_code}")
             else:
                 logger.warning(f"Keep-alive ping returned status {response.status_code}")
         except requests.exceptions.RequestException as e:
+            timestamp = datetime.utcnow().isoformat()
             logger.error(f"Keep-alive ping failed: {e}")
             status_data["keep_alive_status"] = str(e)
+            status_data["last_ping"] = timestamp
+            status_data["recent_logs"].appendleft({"time": timestamp, "status": str(e)})
         time.sleep(interval)
 
 @app.before_first_request
@@ -68,7 +75,9 @@ def get_status():
         token = request.args.get("token")
         if token != STATUS_TOKEN:
             abort(403)
-    return jsonify(status_data)
+    output = status_data.copy()
+    output["recent_logs"] = list(status_data["recent_logs"])
+    return jsonify(output)
 
 def start_monitoring():
     target_url = os.environ.get("TARGET_URL", "https://acro-match.onrender.com")
