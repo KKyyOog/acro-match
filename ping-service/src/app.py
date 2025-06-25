@@ -9,14 +9,12 @@ import requests
 import logging
 from datetime import datetime
 
-print("🟢 LOADED app.py")
-
 # Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("app")
 
 # Add src to path to import services
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
 from services.monitor_service import MonitorService
 
@@ -51,6 +49,12 @@ def keep_alive_loop():
             status_data["keep_alive_status"] = str(e)
         time.sleep(interval)
 
+@app.before_first_request
+def start_background_threads():
+    threading.Thread(target=start_monitoring, daemon=True).start()
+    threading.Thread(target=keep_alive_loop, daemon=True).start()
+    logger.info("Started background threads for monitoring and keep-alive")
+
 @app.route("/")
 def health_check():
     return "Monitor App is running", 200
@@ -65,31 +69,5 @@ def start_monitoring():
     monitor_service.start_monitoring(target_url, interval=interval)
 
 if __name__ == "__main__":
-    # Start both threads
-    threading.Thread(target=start_monitoring, daemon=True).start()
-    threading.Thread(target=keep_alive_loop, daemon=True).start()
-
-    try:
-        from gunicorn.app.base import BaseApplication
-
-        class FlaskApplication(BaseApplication):
-            def __init__(self, app, options=None):
-                self.options = options or {}
-                self.application = app
-                super().__init__()
-
-            def load_config(self):
-                for key, value in self.options.items():
-                    self.cfg.set(key, value)
-
-            def load(self):
-                return self.application
-
-        options = {
-            "bind": "0.0.0.0:5000",
-            "workers": 1
-        }
-        FlaskApplication(app, options).run()
-    except ImportError:
-        print("Gunicorn not installed. Falling back to Flask dev server.")
-        app.run(host="0.0.0.0", port=5000)
+    # Fallback for local dev server
+    app.run(host="0.0.0.0", port=5000)
