@@ -17,7 +17,7 @@ services:
     name: acro-match-monitor
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python monitor_service.py
+    startCommand: gunicorn app:app --bind 0.0.0.0:5000
     rootDir: ping-service/src
     plan: free
 
@@ -26,4 +26,4 @@ services:
     schedule: "*/5 * * * *"  # Every 5 min
     runtime: python
     buildCommand: ""
-    startCommand: python src/keep_alive.py  
+    startCommand: gunicorn app:app --bind 0.0.0.0:5000
