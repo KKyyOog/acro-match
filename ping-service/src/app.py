@@ -1,6 +1,6 @@
 # app.py
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, abort
 import threading
 import time
 import os
@@ -28,6 +28,9 @@ status_data = {
     "keep_alive_status": None,
     "monitor_interval": None
 }
+
+# Optional auth token to protect /status
+STATUS_TOKEN = os.environ.get("STATUS_TOKEN")
 
 def keep_alive_loop():
     target_url = os.environ.get("KEEP_ALIVE_URL", "https://acro-match.onrender.com")
@@ -61,6 +64,10 @@ def health_check():
 
 @app.route("/status")
 def get_status():
+    if STATUS_TOKEN:
+        token = request.args.get("token")
+        if token != STATUS_TOKEN:
+            abort(403)
     return jsonify(status_data)
 
 def start_monitoring():
