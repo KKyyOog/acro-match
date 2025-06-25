@@ -25,7 +25,7 @@ def submit():
         classroom_name = request.form.get("classroom_name")
         details = request.form.get("details")
 
-        if not user_id or not classroom_name:
+        if not classroom_name:
             log_error("必須フィールドが不足しています")
             return "Bad Request: Missing required fields", 400
 
