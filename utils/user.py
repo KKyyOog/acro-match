@@ -5,19 +5,22 @@ from utils.sheets import (
 )
 from utils.logging_util import log_exception
 from datetime import datetime
+import re
 
 def register_user_info(name: str, birthday: str, chat_liff_id: str = "", app_liff_id: str = ""):
     try:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
+        m = re.match(r"(\d{4})年(\d{1,2})月(\d{1,2})日", birthday)
+        if m:
+            birthday = f"{m.group(1)}{int(m.group(2)):02}{int(m.group(3)):02}"
+
         digits = ''.join(filter(str.isdigit, birthday))
         if len(digits) != 8:
             raise ValueError("誕生日は8桁の数値 (YYYYMMDD) である必要があります")
 
-        # アプリ側 LIFF ID のみ更新する場合（名前 + 誕生日下4桁）
-        if name and birthday and app_liff_id:
-            digits = ''.join(filter(str.isdigit, birthday))
-            if len(digits) >= 4 and update_liff_id_by_name_and_birthday4(name, digits[-4:], app_liff_id):
+        if name and digits and app_liff_id:
+            if update_liff_id_by_name_and_birthday4(name, digits[-4:], app_liff_id):
                 return
 
         # それ以外は新規追加 or 情報補完
