@@ -1,8 +1,9 @@
 # blueprints/link.py
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from utils.user import register_user_info
 from utils.sheets import append_row_if_new_user
 from datetime import datetime
+from utils.logging_util import log_exception
 
 link_bp = Blueprint("link", __name__)
 
@@ -28,3 +29,24 @@ def submit():
     except Exception as e:
         print("❌ エラー:", e)
         return "Error", 500
+
+@link_bp.route("/liff", methods=["POST"])
+def link_liff_id():
+    try:
+        data = request.get_json(force=True)
+        nickname = data.get("nickname", "").strip()
+        birthday4 = data.get("birthday4", "").strip()
+        liff_id = data.get("liff_id", "").strip()
+
+        if not (nickname and birthday4 and liff_id):
+            return jsonify({"error": "パラメータ不足"}), 400
+
+        # 仮の生年月日（2000年 + birthday4）で仮登録（8桁整形）
+        birthday8 = f"2000{int(birthday4):02d}" if len(birthday4) == 2 else f"2000{birthday4}"
+
+        register_user_info(nickname, birthday8, app_liff_id=liff_id)
+        return jsonify({"message": "LIFF連携成功"}), 200
+
+    except Exception as e:
+        log_exception(e, context="/link/liff API")
+        return jsonify({"error": "内部エラー"}), 500
