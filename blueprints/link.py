@@ -30,7 +30,7 @@ def submit():
         print("❌ エラー:", e)
         return "Error", 500
 
-@link_bp.route("/liff", methods=["POST"])
+@link_bp.route("/link/liff", methods=["POST"])
 def link_liff_id():
     try:
         data = request.get_json(force=True)
@@ -41,7 +41,6 @@ def link_liff_id():
         if not (nickname and birthday4 and liff_id):
             return jsonify({"error": "パラメータ不足"}), 400
 
-        # 仮の生年月日（2000年 + birthday4）で仮登録（8桁整形）
         birthday8 = f"2000{int(birthday4):02d}" if len(birthday4) == 2 else f"2000{birthday4}"
 
         register_user_info(nickname, birthday8, app_liff_id=liff_id)

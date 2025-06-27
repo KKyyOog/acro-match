@@ -103,5 +103,14 @@
 
     <button type="submit" id="submitBtn" disabled>送信</button>
   </form>
+  <script>
+    document.getElementById("classroomForm").addEventListener("submit", function (e) {
+      const userId = document.getElementById("user_id").value;
+      if (!userId) {
+        alert("LINEログインが完了していません。ページを再読み込みしてください。");
+        e.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>
