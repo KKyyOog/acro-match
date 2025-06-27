@@ -87,7 +87,7 @@ def update_liff_id_by_name_and_birthday4(nickname, birthday4, app_liff_id, sheet
     records = sheet.get_all_records()
     for idx, row in enumerate(records, start=2):
         if row.get("名前") == nickname:
-            full_birthday = row.get("誕生日", "")
+            full_birthday = str(row.get("誕生日", ""))
             digits = ''.join(filter(str.isdigit, full_birthday))
             if len(digits) >= 4 and digits[-4:] == str(birthday4):
                 col_index = list(row.keys()).index("アプリ LIFF ID") + 1
