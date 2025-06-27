@@ -9,6 +9,10 @@ from datetime import datetime
 def register_user_info(name: str, birthday: str, chat_liff_id: str = "", app_liff_id: str = ""):
     try:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        digits = ''.join(filter(str.isdigit, birthday))
+        if len(digits) != 8:
+            raise ValueError("誕生日は8桁の数値 (YYYYMMDD) である必要があります")
 
         # アプリ側 LIFF ID のみ更新する場合（名前 + 誕生日下4桁）
         if name and birthday and app_liff_id:
