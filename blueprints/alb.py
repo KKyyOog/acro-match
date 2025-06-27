@@ -34,7 +34,7 @@ def submit():
         user_id = request.form.get("user_id", "")
         custom_values = [request.form.get(field.get("name", ""), "") for field in settings.get("custom_fields", [])]
 
-        birthday_full = f"2000年{birthday4[:2]}月{birthday4[2:]}日" if len(birthday4) == 4 else ""
+        birthday_full = f"20000302" if birthday4 == "0302" else f"2000{birthday4}" if len(birthday4) == 4 else ""
         register_user_info(name, birthday_full, app_liff_id=user_id)
 
         row = [name, birthday4, experience_str, handslevel_str, area, available, reachtime] + custom_values + [user_id]
