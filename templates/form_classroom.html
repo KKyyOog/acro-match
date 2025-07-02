@@ -135,6 +135,19 @@
           return;
         }
       }
+      // experience, handslevelの必須チェック
+      const experience = document.getElementById("experience");
+      if (experience && experience.selectedOptions.length === 0) {
+        alert("必須フィールド『希望する経験』を選択してください。");
+        e.preventDefault();
+        return;
+      }
+      const handslevel = document.getElementById("handslevel");
+      if (handslevel && handslevel.selectedOptions.length === 0) {
+        alert("必須フィールド『補助レベル』を選択してください。");
+        e.preventDefault();
+        return;
+      }
     });
   </script>
 </body>
