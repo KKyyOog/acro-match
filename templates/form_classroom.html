@@ -66,7 +66,7 @@
     <h2 style="text-align:center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>
 
     <label for="name">{{ settings.form_label_classroom_name | default("教室名") }}</label>
-    <input type="text" name="name" id="name" required>
+    <input type="text" name="classroom_name" id="name" required>
 
     <label for="location">{{ settings.form_label_classroom_location | default("場所") }}</label>
     <input type="text" name="location" id="location" required>
@@ -94,7 +94,7 @@
     </select>
 
     <label for="notes">{{ settings.form_label_classroom_notes | default("補足・備考") }}</label>
-    <input type="text" name="notes" id="notes">
+    <input type="text" name="details" id="notes">
 
     {% set required_custom_fields = [] %}
     {% for field in settings.custom_fields_classroom or [] %}
