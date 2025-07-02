@@ -104,11 +104,22 @@
     <button type="submit" id="submitBtn" disabled>送信</button>
   </form>
   <script>
-    document.getElementById("classroomForm").addEventListener("submit", function (e) {
+    document.querySelector("form").addEventListener("submit", function (e) {
       const userId = document.getElementById("user_id").value;
       if (!userId) {
         alert("LINEログインが完了していません。ページを再読み込みしてください。");
         e.preventDefault();
+        return;
+      }
+      // 必須フィールドのチェック
+      const requiredFields = ["name", "location", "date"];
+      for (const fieldId of requiredFields) {
+        const field = document.getElementById(fieldId);
+        if (!field.value.trim()) {
+          alert(`必須フィールド「${fieldId}」が入力されていません。`);
+          e.preventDefault();
+          return;
+        }
       }
     });
   </script>
