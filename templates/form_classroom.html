@@ -59,7 +59,7 @@
   </script>
 </head>
 <body>
-  <form action="/classroom/submit" method="post">
+  <form action="/classroom/submit" method="post" id="classroomForm">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="user_id" id="user_id" value="">
 
@@ -96,15 +96,19 @@
     <label for="notes">{{ settings.form_label_classroom_notes | default("補足・備考") }}</label>
     <input type="text" name="notes" id="notes">
 
+    {% set required_custom_fields = [] %}
     {% for field in settings.custom_fields_classroom or [] %}
       <label for="{{ field.name }}">{{ field.label }}</label>
-      <input type="text" name="{{ field.name }}" id="{{ field.name }}">
+      <input type="text" name="{{ field.name }}" id="{{ field.name }}" {% if field.required %}required{% endif %}>
+      {% if field.required %}
+        {% set _ = required_custom_fields.append({'name': field.name, 'label': field.label}) %}
+      {% endif %}
     {% endfor %}
 
     <button type="submit" id="submitBtn" disabled>送信</button>
   </form>
   <script>
-    document.querySelector("form").addEventListener("submit", function (e) {
+    document.getElementById("classroomForm").addEventListener("submit", function (e) {
       const userId = document.getElementById("user_id").value;
       if (!userId) {
         alert("LINEログインが完了していません。ページを再読み込みしてください。");
@@ -117,6 +121,16 @@
         const field = document.getElementById(fieldId);
         if (!field.value.trim()) {
           alert(`必須フィールド「${fieldId}」が入力されていません。`);
+          e.preventDefault();
+          return;
+        }
+      }
+      // カスタム必須フィールドのチェック（tojsonでJS配列化）
+      const requiredCustomFields = {{ required_custom_fields | tojson | safe }};
+      for (const f of requiredCustomFields) {
+        const customField = document.getElementById(f.name);
+        if (customField && !customField.value.trim()) {
+          alert(`必須フィールド『${f.label}』が入力されていません。`);
           e.preventDefault();
           return;
         }
