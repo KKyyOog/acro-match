@@ -47,7 +47,8 @@
           liff.login();
           return;
         }
-        // user_idはLIFF IDを使うのでセット不要
+        const profile = await liff.getProfile();
+        document.getElementById("user_id").value = profile.userId;
         document.getElementById("submitBtn").disabled = false;
       } catch (error) {
         console.error("LIFF init error:", error);
@@ -60,7 +61,7 @@
 <body>
   <form action="/classroom/submit" method="post" id="classroomForm">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <input type="hidden" name="user_id" id="user_id" value="{{ liff_id }}">
+    <input type="hidden" name="user_id" id="user_id" value="">
     <input type="hidden" name="liff_id" value="{{ liff_id }}">
 
     <h2 style="text-align:center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>
