@@ -21,8 +21,7 @@ def show_form():
 def submit():
     try:
         # フォームデータを取得
-        liff_id = request.form.get("liff_id")  # ここでliff_idを取得
-        user_id = liff_id  # liff_idをuser_idとして扱う
+        user_id = request.form.get("user_id")  # LINEユーザーIDを取得
         classroom_name = request.form.get("classroom_name")
         location = request.form.get("location")
         date = request.form.get("date")
@@ -44,7 +43,7 @@ def submit():
             ",".join(experience),
             ",".join(handslevel),
             details,
-            liff_id
+            user_id
         ]
         sheet.append_row(row)
         log_info(f"教室登録が完了しました: {row}")
