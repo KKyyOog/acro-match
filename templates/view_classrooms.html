@@ -94,16 +94,38 @@
     button:active {
       background: #00b900;
     }
-    @media (max-width: 600px) {
-      table {
-        font-size: 0.98rem;
-        min-width: 500px;
+    @media (max-width: 700px) {
+      .table-responsive, table, thead, tbody, tr, th, td {
+        display: block;
+        width: 100%;
       }
-      th, td {
-        padding: 0.7rem 0.3rem;
+      thead {
+        display: none;
       }
-      .popup {
-        padding: 1rem;
+      tr {
+        margin-bottom: 1.5rem;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        padding: 1.2rem 0.7rem;
+      }
+      td {
+        border: none;
+        padding: 0.5rem 0.7rem;
+        font-size: 1.15rem;
+        position: relative;
+      }
+      td[data-label]:before {
+        content: attr(data-label) "：";
+        font-weight: bold;
+        color: #06c755;
+        display: block;
+        margin-bottom: 0.2em;
+        font-size: 1.05em;
+      }
+      .interest-btn-row {
+        text-align: right;
+        margin-top: 0.7rem;
       }
     }
   </style>
@@ -197,13 +219,10 @@
       <tbody>
         {% for row_index, popup_data, row_data in rows %}
         <tr>
-          <td class="clickable" onclick="showPopup('{{ row_data[0] }}', '{{ popup_data }}')">
-            {{ row_data[0] }}
-          </td>
-          {% for cell in row_data[1:] %}
-          <td>{{ cell }}</td>
+          {% for col, cell in zip(headers, row_data) %}
+            <td data-label="{{ col }}">{{ cell }}</td>
           {% endfor %}
-          <td>
+          <td class="interest-btn-row">
             <button onclick="submitInterest('{{ row_index | int }}')">興味あり</button>
           </td>
         </tr>
