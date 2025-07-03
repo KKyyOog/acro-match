@@ -23,7 +23,12 @@ def submit():
         # フォームデータを取得
         user_id = request.form.get("user_id")
         classroom_name = request.form.get("classroom_name")
+        location = request.form.get("location")
+        date = request.form.get("date")
+        experience = request.form.getlist("experience[]")
+        handslevel = request.form.getlist("handslevel[]")
         details = request.form.get("details")
+        liff_id = request.form.get("liff_id")
 
         if not user_id or not classroom_name:
             log_error("必須フィールドが不足しています")
@@ -31,7 +36,15 @@ def submit():
 
         # スプレッドシートにデータを追加
         sheet = get_sheet("教室登録シート")
-        row = [user_id, classroom_name, details]
+        row = [
+            classroom_name,
+            location,
+            date,
+            ",".join(experience),
+            ",".join(handslevel),
+            details,
+            liff_id
+        ]
         sheet.append_row(row)
         log_info(f"教室登録が完了しました: {row}")
 
