@@ -21,15 +21,16 @@ def show_form():
 def submit():
     try:
         # フォームデータを取得
-        user_id = request.form.get("user_id")
+        liff_id = request.form.get("liff_id")  # ここでliff_idを取得
+        user_id = liff_id  # liff_idをuser_idとして扱う
         classroom_name = request.form.get("classroom_name")
         location = request.form.get("location")
         date = request.form.get("date")
         experience = request.form.getlist("experience[]")
         handslevel = request.form.getlist("handslevel[]")
         details = request.form.get("details")
-        liff_id = request.form.get("liff_id")
 
+        # user_id, classroom_nameの必須チェック
         if not user_id or not classroom_name:
             log_error("必須フィールドが不足しています")
             return "Bad Request: Missing required fields", 400
