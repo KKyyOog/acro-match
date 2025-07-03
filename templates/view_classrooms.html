@@ -5,24 +5,38 @@
   <title>{{ settings.classroom_title | default("教室登録一覧") }}</title>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 2rem;
+      font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
+      padding: 1rem;
       background: #f9f9f9;
+    }
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 2rem;
     }
     table {
       width: 100%;
+      min-width: 700px;
       border-collapse: collapse;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      font-size: 1.1rem;
     }
     th, td {
-      padding: 1rem;
-      border: 1px solid #ccc;
+      padding: 1.1rem 0.7rem;
+      border-bottom: 1px solid #e0e0e0;
       text-align: left;
-      vertical-align: top;
     }
     th {
-      background-color: #f0f0f0;
+      background: #e8f8f2;
+      font-weight: bold;
+      color: #06c755;
+      font-size: 1.15rem;
+    }
+    tr:nth-child(even) {
+      background: #f7fafc;
     }
     .clickable {
       color: #007bff;
@@ -32,6 +46,8 @@
     h1 {
       text-align: center;
       margin-bottom: 1.5rem;
+      color: #06c755;
+      font-size: 1.5rem;
     }
     .popup {
       display: none;
@@ -43,6 +59,9 @@
       padding: 2rem;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       z-index: 1000;
+      border-radius: 16px;
+      min-width: 250px;
+      max-width: 90vw;
     }
     .popup-overlay {
       display: none;
@@ -60,6 +79,32 @@
       text-align: center;
       color: #007bff;
       cursor: pointer;
+    }
+    button {
+      background: linear-gradient(90deg, #06c755 60%, #00b900 100%);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(6,199,85,0.10);
+      transition: background 0.2s;
+    }
+    button:active {
+      background: #00b900;
+    }
+    @media (max-width: 600px) {
+      table {
+        font-size: 0.98rem;
+        min-width: 500px;
+      }
+      th, td {
+        padding: 0.7rem 0.3rem;
+      }
+      .popup {
+        padding: 1rem;
+      }
     }
   </style>
 
@@ -138,33 +183,34 @@
   <div id="liff-container" style="display: none;" data-liff-id="{{ liff_id | safe }}"
     data-csrf-token="{{ csrf_token() }}"></div>
 
-  <h1>{{ settings.classroom_title | default("教室登録一覧") }}</h1>
-
-  <table>
-    <thead>
-      <tr>
-        {% for header in headers %}
-          <th>{{ header }}</th>
+  <h1><span style="vertical-align:middle;">📋</span> {{ settings.classroom_title | default("教室登録一覧") }}</h1>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          {% for header in headers %}
+            <th>{{ header }}</th>
+          {% endfor %}
+          <th>興味あり</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row_index, popup_data, row_data in rows %}
+        <tr>
+          <td class="clickable" onclick="showPopup('{{ row_data[0] }}', '{{ popup_data }}')">
+            {{ row_data[0] }}
+          </td>
+          {% for cell in row_data[1:] %}
+          <td>{{ cell }}</td>
+          {% endfor %}
+          <td>
+            <button onclick="submitInterest('{{ row_index | int }}')">興味あり</button>
+          </td>
+        </tr>
         {% endfor %}
-        <th>興味あり</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row_index, popup_data, row_data in rows %}
-      <tr>
-        <td class="clickable" onclick="showPopup('{{ row_data[0] }}', '{{ popup_data }}')">
-          {{ row_data[0] }}
-        </td>
-        {% for cell in row_data[1:] %} <!-- その他自由記述を除外 -->
-        <td>{{ cell }}</td>
-        {% endfor %}
-        <td>
-          <button onclick="submitInterest('{{ row_index | int }}')">興味あり</button>
-        </td>
-      </tr>
-      {% endfor %}
       </tbody>
-  </table>
+    </table>
+  </div>
   <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
   <div id="popup" class="popup">
     <div class="popup-content"></div>
