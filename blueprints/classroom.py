@@ -30,7 +30,7 @@ def submit():
             return "Bad Request: Missing required fields", 400
 
         # スプレッドシートにデータを追加
-        sheet = get_sheet()
+        sheet = get_sheet("教室登録シート")
         row = [user_id, classroom_name, details]
         sheet.append_row(row)
         log_info(f"教室登録が完了しました: {row}")
@@ -107,7 +107,7 @@ def handle_interest():
         sheet = get_sheet("教室登録シート")
         rows = sheet.get_all_values()[1:]  # ヘッダーを除いたデータ行を取得
 
-        if row_index < 1 or row_index > len(rows):
+        if row_index < 1 | row_index > len(rows):
             log_error(f"row_index が範囲外です: {row_index}")
             return "Bad Request: 'row_index' out of range", 400
 
