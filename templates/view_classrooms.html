@@ -16,7 +16,7 @@
     }
     table {
       width: 100%;
-      min-width: 700px;
+      min-width: 1400px;
       border-collapse: collapse;
       background: #fff;
       border-radius: 12px;
@@ -25,9 +25,13 @@
       font-size: 1.1rem;
     }
     th, td {
-      padding: 1.1rem 0.7rem;
+      padding: 1.5rem 1rem;
       border-bottom: 1px solid #e0e0e0;
       text-align: left;
+      font-size: 1.22rem;
+    }
+    tr {
+      min-height: 3.5rem;
     }
     th {
       background: #e8f8f2;
@@ -105,22 +109,27 @@
     @media (max-width: 700px) {
       .table-responsive, table, thead, tbody, tr, th, td {
         display: block;
-        width: 100%;
+        width: 100vw;
+      }
+      table {
+        min-width: 0;
+        width: 100vw;
       }
       thead {
         display: none;
       }
       tr {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.7rem;
         background: #fff;
         border-radius: 14px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-        padding: 1.2rem 0.7rem;
+        padding: 1.5rem 0.7rem;
+        min-height: 3.5rem;
       }
       td {
         border: none;
-        padding: 0.5rem 0.7rem;
-        font-size: 1.15rem;
+        padding: 1rem 0.7rem;
+        font-size: 1.22rem;
         position: relative;
       }
       td[data-label]:before {
@@ -129,7 +138,7 @@
         color: #06c755;
         display: block;
         margin-bottom: 0.2em;
-        font-size: 1.05em;
+        font-size: 1.13em;
       }
       .interest-btn-row {
         text-align: right;
