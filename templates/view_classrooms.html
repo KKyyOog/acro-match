@@ -219,8 +219,8 @@
       <tbody>
         {% for row_index, popup_data, row_data in rows %}
         <tr>
-          {% for col, cell in zip(headers, row_data) %}
-            <td data-label="{{ col }}">{{ cell }}</td>
+          {% for i in range(headers|length) %}
+            <td data-label="{{ headers[i] }}">{{ row_data[i] }}</td>
           {% endfor %}
           <td class="interest-btn-row">
             <button onclick="submitInterest('{{ row_index | int }}')">興味あり</button>
