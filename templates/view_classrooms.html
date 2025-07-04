@@ -244,8 +244,7 @@
         <tr>
           {% for i in range(headers|length) %}
             {% if headers[i] == '補助レベル' %}
-              {# 希望経験でまとめて表示したのでスキップ #}
-              {% continue %}
+              {# 何も出力しない（スキップ） #}
             {% elif headers[i] == '希望経験' and i+1 < headers|length and headers[i+1] == '補助レベル' %}
               <td data-label="希望経験・補助レベル">
                 <div>{{ row_data[i] }}</div>
