@@ -243,14 +243,7 @@
         {% for row_index, popup_data, row_data in rows %}
         <tr>
           {% for i in range(headers|length) %}
-            {% if headers[i] == '補助レベル' %}
-              {# 何も出力しない #}
-            {% elif headers[i] == '希望経験' and i+1 < headers|length and headers[i+1] == '補助レベル' %}
-              <td data-label="希望経験・補助レベル" colspan="2">
-                <div>{{ row_data[i] }}</div>
-                <div>{{ row_data[i+1] }}</div>
-              </td>
-            {% elif i == 0 %}
+            {% if i == 0 %}
               <td data-label="{{ headers[i] }}" class="clickable" onclick="showPopup('{{ row_data[0]|e }}', '{{ popup_data.details|e }}')">{{ row_data[i] }}</td>
             {% else %}
               <td data-label="{{ headers[i] }}">{{ row_data[i] }}</td>
