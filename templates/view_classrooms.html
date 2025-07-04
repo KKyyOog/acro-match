@@ -242,13 +242,23 @@
       <tbody>
         {% for row_index, popup_data, row_data in rows %}
         <tr>
-          {% for i in range(headers|length) %}
+          {% set i = 0 %}
+          {% while i < headers|length %}
+            {% if headers[i] == '希望経験' and i+1 < headers|length and headers[i+1] == '補助レベル' %}
+              <td data-label="希望経験・補助レベル">
+                <div>{{ row_data[i] }}</div>
+                <div>{{ row_data[i+1] }}</div>
+              </td>
+              {% set i = i + 2 %}
+              {% continue %}
+            {% endif %}
             {% if i == 0 %}
               <td data-label="{{ headers[i] }}" class="clickable" onclick="showPopup('{{ row_data[0]|e }}', '{{ popup_data.details|e }}')">{{ row_data[i] }}</td>
             {% else %}
               <td data-label="{{ headers[i] }}">{{ row_data[i] }}</td>
             {% endif %}
-          {% endfor %}
+            {% set i = i + 1 %}
+          {% endwhile %}
           <td class="interest-btn-row">
             <button onclick="submitInterest('{{ row_index | int }}')">興味あり</button>
           </td>
