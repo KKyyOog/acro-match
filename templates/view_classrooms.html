@@ -106,6 +106,12 @@
     button:active {
       background: #00b900;
     }
+    th.experience-col, td.experience-col,
+    th.level-col, td.level-col {
+      min-width: 180px;
+      max-width: 320px;
+      word-break: break-all;
+    }
     @media (max-width: 700px) {
       .table-responsive, table, thead, tbody, tr, th, td {
         display: block;
@@ -243,7 +249,19 @@
         {% for row_index, popup_data, row_data in rows %}
         <tr>
           {% for i in range(headers|length) %}
-            {% if i == 0 %}
+            {% if headers[i] == '希望経験' %}
+              <td data-label="{{ headers[i] }}" class="experience-col">
+                {% for item in row_data[i].split(',') %}
+                  <div>{{ item.strip() }}</div>
+                {% endfor %}
+              </td>
+            {% elif headers[i] == '補助レベル' %}
+              <td data-label="{{ headers[i] }}" class="level-col">
+                {% for item in row_data[i].split(',') %}
+                  <div>{{ item.strip() }}</div>
+                {% endfor %}
+              </td>
+            {% elif i == 0 %}
               <td data-label="{{ headers[i] }}" class="clickable" onclick="showPopup('{{ row_data[0]|e }}', '{{ popup_data.details|e }}')">{{ row_data[i] }}</td>
             {% else %}
               <td data-label="{{ headers[i] }}">{{ row_data[i] }}</td>
