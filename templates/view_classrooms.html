@@ -220,7 +220,11 @@
         {% for row_index, popup_data, row_data in rows %}
         <tr>
           {% for i in range(headers|length) %}
-            <td data-label="{{ headers[i] }}">{{ row_data[i] }}</td>
+            {% if i == 0 %}
+              <td data-label="{{ headers[i] }}" class="clickable" onclick="showPopup('{{ row_data[0]|e }}', '{{ popup_data.details|e }}')">{{ row_data[i] }}</td>
+            {% else %}
+              <td data-label="{{ headers[i] }}">{{ row_data[i] }}</td>
+            {% endif %}
           {% endfor %}
           <td class="interest-btn-row">
             <button onclick="submitInterest('{{ row_index | int }}')">興味あり</button>
