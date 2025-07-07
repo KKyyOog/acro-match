@@ -36,6 +36,12 @@
       font-size: 1rem;
       background: #06c755;
     }
+    .required-mark {
+      color: #e53935;
+      font-weight: bold;
+      margin-left: 0.2em;
+      font-size: 1.1em;
+    }
   </style>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
@@ -69,13 +75,13 @@
     <h2 style="text-align:center;">{{ settings.title | default("フォーム") }}</h2>
     <input type="hidden" name="user_id" id="user_id" value="">
 
-    <label for="name">{{ settings.form_label_alb_name | default("ニックネーム") }}</label>
+    <label for="name">{{ settings.form_label_alb_name | default("ニックネーム") }}<span class="required-mark">＊</span></label>
     <input type="text" name="name" id="name" required aria-required="true">
 
-    <label for="birthday4">{{ settings.form_label_birthday4 | default("生年月日（月日4桁・例：0602）") }}</label>
+    <label for="birthday4">{{ settings.form_label_birthday4 | default("生年月日（月日4桁・例：0602）") }}<span class="required-mark">＊</span></label>
     <input type="text" name="birthday4" id="birthday4" pattern="\d{4}" maxlength="4" placeholder="0602" required aria-required="true">
 
-    <label for="experience">{{ settings.form_label_alb_experience | default("経験（複数選択可）") }}</label>
+    <label for="experience">{{ settings.form_label_alb_experience | default("経験（複数選択可）") }}<span class="required-mark">＊</span></label>
     <select name="experience[]" id="experience" multiple size="5" aria-multiselectable="true">
       <option value="体操">体操</option>
       <option value="パルクール">パルクール</option>
@@ -84,7 +90,7 @@
       <option value="ダンス">ダンス</option>
     </select>
 
-    <label for="handslevel">{{ settings.form_label_alb_handslevel | default("補助レベル（複数選択可）") }}</label>
+    <label for="handslevel">{{ settings.form_label_alb_handslevel | default("補助レベル（複数選択可）") }}<span class="required-mark">＊</span></label>
     <select name="handslevel[]" id="handslevel" multiple size="5" aria-multiselectable="true">
       <option value="経験なし">経験なし</option>
       <option value="おとな">おとな</option>
@@ -100,18 +106,18 @@
       <option value="側宙">側宙</option>
     </select>
 
-    <label for="area">{{ settings.form_label_area | default("希望エリア") }}</label>
+    <label for="area">{{ settings.form_label_area | default("希望エリア") }}<span class="required-mark">＊</span></label>
     <input type="text" name="area" id="area" required aria-required="true">
 
-    <label for="available">{{ settings.form_label_available | default("稼働可能日・時間") }}</label>
+    <label for="available">{{ settings.form_label_available | default("稼働可能日・時間") }}<span class="required-mark">＊</span></label>
     <input type="text" name="available" id="available" required aria-required="true">
 
-    <label for="reachtime">{{ settings.form_label_reachtime | default("連絡可能時間帯") }}</label>
+    <label for="reachtime">{{ settings.form_label_reachtime | default("連絡可能時間帯") }}<span class="required-mark">＊</span></label>
     <input type="text" name="reachtime" id="reachtime" required aria-required="true">
 
     {% for field in settings.custom_fields or [] %}
-      <label for="{{ field.name }}">{{ field.label }}</label>
-      <input type="text" name="{{ field.name }}" id="{{ field.name }}">
+      <label for="{{ field.name }}">{{ field.label }}{% if field.required %}<span class="required-mark">＊</span>{% endif %}</label>
+      <input type="text" name="{{ field.name }}" id="{{ field.name }}" {% if field.required %}required{% endif %}>
     {% endfor %}
 
     <button type="submit" id="submitBtn" disabled style="background: {{ settings.button_color | default('#06c755') }};">送信</button>

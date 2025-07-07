@@ -36,6 +36,12 @@
       font-size: 1rem;
       background: {{ settings.button_color | default('#06c755') }};
     }
+    .required-mark {
+      color: #e53935;
+      font-weight: bold;
+      margin-left: 0.2em;
+      font-size: 1.1em;
+    }
   </style>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
@@ -66,16 +72,16 @@
 
     <h2 style="text-align:center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>
 
-    <label for="name">{{ settings.form_label_classroom_name | default("教室名") }}</label>
+    <label for="name">{{ settings.form_label_classroom_name | default("教室名") }}<span class="required-mark">＊</span></label>
     <input type="text" name="classroom_name" id="name" required>
 
-    <label for="location">{{ settings.form_label_classroom_location | default("場所") }}</label>
+    <label for="location">{{ settings.form_label_classroom_location | default("場所") }}<span class="required-mark">＊</span></label>
     <input type="text" name="location" id="location" required>
 
-    <label for="date">{{ settings.form_label_classroom_date | default("開催日") }}</label>
+    <label for="date">{{ settings.form_label_classroom_date | default("開催日") }}<span class="required-mark">＊</span></label>
     <input type="date" name="date" id="date" required>
 
-    <label for="experience">{{ settings.form_label_classroom_experience | default("希望する経験") }}</label>
+    <label for="experience">{{ settings.form_label_classroom_experience | default("希望する経験") }}<span class="required-mark">＊</span></label>
     <select name="experience[]" id="experience" multiple size="5" aria-multiselectable="true">
       <option value="体操">体操</option>
       <option value="パルクール">パルクール</option>
@@ -84,7 +90,7 @@
       <option value="ダンス">ダンス</option>
     </select>
 
-    <label for="handslevel">{{ settings.form_label_classroom_support_level | default("補助レベル") }}</label>
+    <label for="handslevel">{{ settings.form_label_classroom_support_level | default("補助レベル") }}<span class="required-mark">＊</span></label>
     <select name="handslevel[]" id="handslevel" multiple size="5" aria-multiselectable="true">
       <option value="経験なし">経験なし</option>
       <option value="おとな">おとな</option>
@@ -99,7 +105,7 @@
 
     {% set required_custom_fields = [] %}
     {% for field in settings.custom_fields_classroom or [] %}
-      <label for="{{ field.name }}">{{ field.label }}</label>
+      <label for="{{ field.name }}">{{ field.label }}{% if field.required %}<span class="required-mark">＊</span>{% endif %}</label>
       <input type="text" name="{{ field.name }}" id="{{ field.name }}" {% if field.required %}required{% endif %}>
       {% if field.required %}
         {% set _ = required_custom_fields.append({'name': field.name, 'label': field.label}) %}
@@ -127,7 +133,7 @@
         }
       }
       // カスタム必須フィールドのチェック（tojsonでJS配列化）
-      const requiredCustomFields = {{ required_custom_fields | tojson | safe }};
+      const requiredCustomFields = JSON.parse('{{ required_custom_fields | tojson | safe }}');
       for (const f of requiredCustomFields) {
         const customField = document.getElementById(f.name);
         if (customField && !customField.value.trim()) {
