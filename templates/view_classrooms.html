@@ -239,6 +239,7 @@
     <table>
       <thead>
         <tr>
+          <th>No.</th>
           {% for header in headers %}
             <th>{{ header }}</th>
           {% endfor %}
@@ -248,8 +249,9 @@
       <tbody>
         {% for row_index, popup_data, row_data in rows %}
         <tr>
-          {% for i in range(headers|length) %}
-            {% if headers[i] == '希望経験' %}
+          <td data-label="No.">{{ row_index }}</td>
+          {% for i in range(row_data|length) %}
+            {% if headers[i] == '希望する経験' %}
               <td data-label="{{ headers[i] }}" class="experience-col">
                 {% for item in row_data[i].split(',') %}
                   <div>{{ item.strip() }}</div>
