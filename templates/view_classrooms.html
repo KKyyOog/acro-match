@@ -215,7 +215,7 @@
     function showPopup(classroomName, details) {
         const popup = document.getElementById("popup");
         const overlay = document.getElementById("popup-overlay");
-        popup.querySelector(".popup-content").innerText = `教室名: ${classroomName}\nその他自由記述: ${details}`;
+        popup.querySelector(".popup-content").innerText = `教室名: ${classroomName}\n業務詳細・その他自由記述: ${details}`;
         popup.style.display = "block";
         overlay.style.display = "block";
       }
@@ -262,7 +262,7 @@
                 {% endfor %}
               </td>
             {% elif i == 0 %}
-              <td data-label="{{ headers[i] }}" class="clickable" onclick="showPopup('{{ row_data[0]|e }}', '{{ popup_data.details|e }}')">{{ row_data[i] }}</td>
+              <td data-label="{{ headers[i] }}" class="clickable" onclick="showPopup('{{ row_data[0]|e }}', '{{ popup_data|e }}')">{{ row_data[i] }}</td>
             {% else %}
               <td data-label="{{ headers[i] }}">{{ row_data[i] }}</td>
             {% endif %}
