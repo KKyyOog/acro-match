@@ -73,7 +73,7 @@
     <input type="text" name="location" id="location" required>
 
     <label for="date">{{ settings.form_label_classroom_date | default("開催日") }}</label>
-    <input type="text" name="date" id="date" placeholder="例: 2025-06-15" required>
+    <input type="date" name="date" id="date" required>
 
     <label for="experience">{{ settings.form_label_classroom_experience | default("希望する経験") }}</label>
     <select name="experience[]" id="experience" multiple size="5" aria-multiselectable="true">
