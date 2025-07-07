@@ -73,11 +73,11 @@ def view_recruitment():
         # ヘッダーからLIFF ID列を削除
         headers = headers[:-1]  # 最後の列（LIFF ID）を削除
 
-        # 各行から「その他自由記述」を分離し、ポップアップ用に保持
+        # 各行から「業務詳細・その他自由記述」を分離し、ポップアップ用に保持
         processed_rows = []
         for row in rows:
-            popup_data = row[-2]  # その他自由記述（最後から2番目の列）
-            row_data = row[:-2]  # 表に表示するデータ（その他自由記述とLIFF IDを除外）
+            popup_data = row[-2]  # 業務詳細・その他自由記述（最後から2番目の列）
+            row_data = row[:-2]  # 表に表示するデータ（業務詳細・その他自由記述とLIFF IDを除外）
             processed_rows.append((popup_data, row_data))
 
         # 各行にインデックスを付与
@@ -85,7 +85,16 @@ def view_recruitment():
         log_info(f"教室募集一覧を取得しました: {indexed_rows}")
 
         context = {
-            "headers": headers[:-1],  # 表に表示するヘッダー（その他自由記述を除外）
+            "headers": headers[:-1],  # 表に表示するヘッダー（業務詳細・その他自由記述を除外）
+            # ↓ヘッダー名を明示的に上書き
+            "headers": [
+                "No.",
+                "教室名",
+                "場所",
+                "開催日",
+                "希望する経験",  # ←ここだけにする
+                "補助レベル"
+            ],
             "rows": indexed_rows,
             "settings": settings,
             "liff_id": liff_id,
