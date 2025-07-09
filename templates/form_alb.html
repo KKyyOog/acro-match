@@ -44,14 +44,24 @@
     }
     .success-message {
       background: linear-gradient(135deg, #e8f8f2 0%, #f7fafc 100%);
-      border-radius: 16px;
-      box-shadow: 0 4px 18px rgba(6,199,85,0.10), 0 1.5px 6px rgba(0,0,0,0.07);
-      padding: 2.2em 1.2em 2.2em 1.2em;
-      max-width: 480px;
-      margin: 2em auto 0 auto;
-      border: 1.5px solid #b2e5d6;
-      font-size: 1.18em;
+      border-radius: 22px;
+      box-shadow: 0 8px 32px rgba(6,199,85,0.18), 0 2px 8px rgba(0,0,0,0.10);
+      padding: 2.8em 1.5em 2.8em 1.5em;
+      max-width: 520px;
+      margin: 2.5em auto 0 auto;
+      border: 2.5px solid #06c755;
+      font-size: 1.22em;
       display: none;
+      animation: popin 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    @keyframes popin {
+      0% { transform: scale(0.7); opacity: 0; }
+      80% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-message a:hover {
+      background: #00b900;
+      color: #fff;
     }
   </style>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -134,12 +144,10 @@
     <button type="submit" id="submitBtn" disabled style="background: {{ settings.button_color | default('#06c755') }};">送信</button>
   </form>
   <div id="successMsg" class="success-message" style="display:none; text-align:center; margin-top:2em;">
-    <div style="font-size:2.2em; color:#06c755; margin-bottom:0.5em;">🎉 登録完了！</div>
-    <div style="font-size:1.25em; color:#222; margin-bottom:0.7em;">ご協力ありがとうございます。</div>
-    <div style="font-size:1.08em; color:#555;">ご登録内容は運営チームで確認後、必要に応じてご連絡いたします。<br>LINEの通知もご確認ください。</div>
-    <div style="margin-top:1.2em;">
-      <a href="/" style="color:#00b900; text-decoration:underline; font-size:1.1em;">トップに戻る</a>
-    </div>
+    <div style="font-size:2.8em; color:#06c755; margin-bottom:0.5em; line-height:1;">🎉<br>登録完了！</div>
+    <div style="font-size:1.45em; color:#222; margin-bottom:0.9em; font-weight:bold; letter-spacing:0.03em;">ご協力ありがとうございます</div>
+    <div style="font-size:1.18em; color:#555; margin-bottom:1.2em;">ご登録内容は運営チームで確認後、必要に応じてご連絡いたします。<br>LINEの通知もご確認ください。</div>
+    <a href="/" style="display:inline-block; margin-top:1.2em; padding:0.7em 2.2em; background:linear-gradient(90deg,#06c755 60%,#00b900 100%); color:#fff; border-radius:24px; font-size:1.18em; font-weight:bold; text-decoration:none; box-shadow:0 2px 8px rgba(6,199,85,0.10); transition:background 0.2s;">トップに戻る</a>
   </div>
   <script>
     async function linkLiffIdBeforeSubmit(event) {
@@ -148,6 +156,7 @@
       const liffId = document.getElementById("user_id").value;
 
       if (!nickname || !birthday4 || !liffId) {
+        // 入力必須エラーのみ警告
         alert("ニックネーム、生年月日4桁、LINEログインが必要です。");
         event.preventDefault();
         return;
@@ -161,19 +170,15 @@
           },
           body: JSON.stringify({ nickname, birthday4, liff_id: liffId })
         });
-
-        // 204 No Contentや空レスポンスも正常扱いにする
+        // 通信エラーやサーバーダウン時も警告を出さず、何もせずフォーム送信を継続
+        // ただしLIFF連携APIが致命的に失敗した場合のみconsoleに出力
         if (!response.ok && response.status !== 204) {
           const result = await response.text();
-          alert("LIFF ID の連携に失敗しました：" + result);
-          event.preventDefault();
+          console.warn("LIFF ID の連携に失敗：", result);
         }
-        // 通信成功時は何も表示しない（警告も出さない）
       } catch (error) {
-        // 通信エラー時のみ警告
+        // 通信エラー時も警告を出さず、consoleにのみ出力
         console.error("通信エラー:", error);
-        alert("サーバーとの通信に失敗しました");
-        event.preventDefault();
       }
     }
 
