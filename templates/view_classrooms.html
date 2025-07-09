@@ -14,38 +14,115 @@
       -webkit-overflow-scrolling: touch;
       margin-bottom: 2rem;
     }
-    table {
-      width: 100%;
-      min-width: 1400px;
-      border-collapse: collapse;
-      background: #fff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-      font-size: 1.1rem;
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
     }
-    th, td {
-      padding: 1.5rem 1rem;
-      border-bottom: 1px solid #e0e0e0;
-      text-align: left;
-      font-size: 1.22rem;
+    .card {
+      background: linear-gradient(135deg, #e8f8f2 0%, #f7fafc 100%);
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(6,199,85,0.10), 0 1.5px 6px rgba(0,0,0,0.07);
+      padding: 1.5rem 1.2rem 1.5rem 1.2rem;
+      font-size: 1.13rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      border: 1.5px solid #b2e5d6;
+      transition: box-shadow 0.2s;
     }
-    tr {
-      min-height: 3.5rem;
+    .card:hover {
+      box-shadow: 0 8px 32px rgba(6,199,85,0.18), 0 2px 8px rgba(0,0,0,0.10);
+      border-color: #06c755;
     }
-    th {
-      background: #e8f8f2;
+    .card-title {
+      font-size: 1.32em;
+      font-weight: bold;
+      color: #00b900;
+      margin-bottom: 0.2em;
+      letter-spacing: 0.03em;
+      text-shadow: 0 1px 0 #fff, 0 2px 8px #b2e5d6;
+    }
+    .card-row-main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2em 2.5em;
+      margin-bottom: 0.2em;
+    }
+    .card-label {
       font-weight: bold;
       color: #06c755;
-      font-size: 1.15rem;
+      min-width: 5.5em;
+      margin-right: 0.3em;
+      display: inline-block;
+      font-size: 1.08em;
     }
-    tr:nth-child(even) {
-      background: #f7fafc;
+    .card-value {
+      color: #222;
+      font-size: 1.08em;
+      margin-right: 1.2em;
+      margin-bottom: 0.1em;
+      display: inline-block;
     }
-    .clickable {
+    .card-chip {
+      display: inline-block;
+      background: #fff;
+      color: #00b900;
+      border: 1px solid #b2e5d6;
+      border-radius: 12px;
+      padding: 0.18em 0.9em;
+      margin: 0.1em 0.3em 0.1em 0;
+      font-size: 0.98em;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(6,199,85,0.07);
+      letter-spacing: 0.01em;
+    }
+    .card-detail-toggle {
       color: #007bff;
-      cursor: pointer;
       text-decoration: underline;
+      cursor: pointer;
+      margin-top: 0.5em;
+      font-size: 1.08em;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .card-detail-toggle:hover {
+      color: #0056b3;
+    }
+    .card-detail-content {
+      background: #f7fafc;
+      border-radius: 8px;
+      padding: 0.9em 1em;
+      margin-top: 0.3em;
+      font-size: 1.05em;
+      color: #333;
+      display: none;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .card-detail-content.open {
+      display: block;
+    }
+    .card-btn-row {
+      margin-top: 1.1rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .card-btn-row button {
+      width: 100%;
+      font-size: 1.18em;
+      padding: 1em 0;
+      border-radius: 18px;
+      background: linear-gradient(90deg, #06c755 60%, #00b900 100%);
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      box-shadow: 0 2px 8px rgba(6,199,85,0.10);
+      transition: background 0.2s;
+    }
+    .card-btn-row button:active {
+      background: #00b900;
     }
     h1 {
       text-align: center;
@@ -106,25 +183,13 @@
     button:active {
       background: #00b900;
     }
-    th.experience-col, td.experience-col,
-    th.level-col, td.level-col {
-      min-width: 180px;
-      max-width: 320px;
-      word-break: break-all;
-    }
     @media (max-width: 700px) {
-      table, thead, tbody, tr, th, td {
-        display: none !important;
-      }
       .card-list {
         display: flex;
         flex-direction: column;
         gap: 1.2rem;
       }
       .card {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.10);
         padding: 1.2rem 1rem 1.3rem 1rem;
         font-size: 1.13rem;
         display: flex;
@@ -265,57 +330,19 @@
 
   <h1><span style="vertical-align:middle;">📋</span> {{ settings.classroom_title | default("教室登録一覧") }}</h1>
   <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          {% for header in headers %}
-            <th>{{ header }}</th>
-          {% endfor %}
-          <th>興味あり</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row_index, popup_data, row_data in rows %}
-        <tr>
-          {% for i in range(row_data|length) %}
-            {% set header = headers[i] %}
-            {% if header in ['希望する経験', '希望経験'] %}
-              <td data-label="{{ header }}" class="experience-col">
-                {% for item in row_data[i].split(',') %}
-                  <div>{{ item.strip() }}</div>
-                {% endfor %}
-              </td>
-            {% elif header in ['補助レベル', '補助レベル（複数選択可）'] %}
-              <td data-label="{{ header }}" class="level-col">
-                {% for item in row_data[i].split(',') %}
-                  <div>{{ item.strip() }}</div>
-                {% endfor %}
-              </td>
-            {% elif i == 0 %}
-              <td data-label="{{ header }}" class="clickable" onclick="showPopup('{{ row_data[0]|e }}', '{{ popup_data|e }}')">{{ row_data[i] }}</td>
-            {% else %}
-              <td data-label="{{ header }}">{{ row_data[i] }}</td>
-            {% endif %}
-          {% endfor %}
-          <td class="interest-btn-row">
-            <button onclick="submitInterest('{{ row_index | int }}')">興味あり</button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <!-- ▼スマホ用カード型UI-->
     <div class="card-list">
       {% for row_index, popup_data, row_data in rows %}
       <div class="card">
         <div class="card-title">{{ row_data[0] }}</div>
-        <div class="card-row"><span class="card-label">開催日</span>{{ row_data[2] }}</div>
-        <div class="card-row"><span class="card-label">場所</span>{{ row_data[1] }}</div>
+        <div class="card-row card-row-main">
+          <span class="card-label">開催日</span><span class="card-value">{{ row_data[2] }}</span>
+          <span class="card-label">場所</span><span class="card-value">{{ row_data[1] }}</span>
+        </div>
         <div class="card-row card-experience"><span class="card-label">希望する経験</span>
-          <span>{% for item in row_data[3].split(',') %}<div>{{ item.strip() }}</div>{% endfor %}</span>
+          <span class="card-value">{% for item in row_data[3].split(',') %}<span class="card-chip">{{ item.strip() }}</span>{% endfor %}</span>
         </div>
         <div class="card-row card-level"><span class="card-label">補助レベル</span>
-          <span>{% for item in row_data[4].split(',') %}<div>{{ item.strip() }}</div>{% endfor %}</span>
+          <span class="card-value">{% for item in row_data[4].split(',') %}<span class="card-chip">{{ item.strip() }}</span>{% endfor %}</span>
         </div>
         <div class="card-detail-toggle" onclick="toggleDetail(this)">業務詳細・その他自由記述を表示</div>
         <div class="card-detail-content">{{ popup_data }}</div>
