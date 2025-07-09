@@ -113,78 +113,77 @@
       word-break: break-all;
     }
     @media (max-width: 700px) {
-      .table-responsive, table, thead, tbody, tr, th, td {
-        display: block;
-        width: 100vw;
+      table, thead, tbody, tr, th, td {
+        display: none !important;
       }
-      table {
-        min-width: 0;
-        width: 100vw;
-        border-radius: 0;
-        box-shadow: none;
+      .card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
       }
-      thead {
-        display: none;
-      }
-      tr {
-        margin-bottom: 1.7rem;
+      .card {
         background: #fff;
-        border-radius: 14px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-        padding: 1.2rem 0.7rem 0.7rem 0.7rem;
-        min-height: 3.5rem;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        padding: 1.2rem 1rem 1.3rem 1rem;
+        font-size: 1.13rem;
         display: flex;
         flex-direction: column;
         gap: 0.7rem;
       }
-      td {
-        border: none;
-        padding: 0.5rem 0.7rem 0.2rem 0.7rem;
-        font-size: 1.13rem;
-        position: relative;
-        background: none;
-        box-shadow: none;
-        border-radius: 0;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5em;
-      }
-      td[data-label]:before {
-        content: attr(data-label) "：";
+      .card-label {
         font-weight: bold;
         color: #06c755;
-        display: inline-block;
         min-width: 6em;
-        font-size: 1.13em;
         margin-right: 0.3em;
+        display: inline-block;
+        font-size: 1.08em;
       }
-      td.clickable {
+      .card-title {
         font-size: 1.22em;
         font-weight: bold;
         color: #00b900;
         margin-bottom: 0.2em;
       }
-      .interest-btn-row {
-        text-align: right;
+      .card-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5em;
+      }
+      .card-experience, .card-level {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1em;
+      }
+      .card-detail-toggle {
+        color: #007bff;
+        text-decoration: underline;
+        cursor: pointer;
+        margin-top: 0.5em;
+        font-size: 1.05em;
+      }
+      .card-detail-content {
+        background: #f7fafc;
+        border-radius: 8px;
+        padding: 0.7em 0.8em;
+        margin-top: 0.3em;
+        font-size: 1.05em;
+        color: #333;
+        display: none;
+      }
+      .card-detail-content.open {
+        display: block;
+      }
+      .card-btn-row {
         margin-top: 1.1rem;
         display: flex;
         justify-content: flex-end;
       }
-      .interest-btn-row button {
+      .card-btn-row button {
         width: 100%;
         font-size: 1.18em;
         padding: 1em 0;
         border-radius: 18px;
-      }
-      .experience-col, .level-col {
-        flex-direction: column;
-        gap: 0.1em;
-      }
-      .popup {
-        min-width: 0;
-        max-width: 98vw;
-        padding: 2rem 0.5rem;
-        font-size: 1.13rem;
       }
     }
   </style>
@@ -305,11 +304,44 @@
         {% endfor %}
       </tbody>
     </table>
+    <!-- ▼スマホ用カード型UI-->
+    <div class="card-list">
+      {% for row_index, popup_data, row_data in rows %}
+      <div class="card">
+        <div class="card-title">{{ row_data[0] }}</div>
+        <div class="card-row"><span class="card-label">開催日</span>{{ row_data[2] }}</div>
+        <div class="card-row"><span class="card-label">場所</span>{{ row_data[1] }}</div>
+        <div class="card-row card-experience"><span class="card-label">希望する経験</span>
+          <span>{% for item in row_data[3].split(',') %}<div>{{ item.strip() }}</div>{% endfor %}</span>
+        </div>
+        <div class="card-row card-level"><span class="card-label">補助レベル</span>
+          <span>{% for item in row_data[4].split(',') %}<div>{{ item.strip() }}</div>{% endfor %}</span>
+        </div>
+        <div class="card-detail-toggle" onclick="toggleDetail(this)">業務詳細・その他自由記述を表示</div>
+        <div class="card-detail-content">{{ popup_data }}</div>
+        <div class="card-btn-row">
+          <button onclick="submitInterest('{{ row_index | int }}')">興味あり</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
   <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
   <div id="popup" class="popup">
     <div class="popup-content"></div>
     <span class="popup-close" onclick="closePopup()">閉じる</span>
   </div>
+  <script>
+    function toggleDetail(el) {
+      const content = el.nextElementSibling;
+      if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        el.innerText = '業務詳細・その他自由記述を表示';
+      } else {
+        content.classList.add('open');
+        el.innerText = '業務詳細・その他自由記述を閉じる';
+      }
+    }
+  </script>
 </body>
 </html>
