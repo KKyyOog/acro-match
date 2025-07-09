@@ -91,7 +91,7 @@
       {{ error_msg }}
     </p>
   {% endif %}
-  <form action="/alb/submit" method="post">
+  <form action="/alb/submit" method="post" id="albForm">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 style="text-align:center;">{{ settings.title | default("フォーム") }}</h2>
     <input type="hidden" name="user_id" id="user_id" value="">
@@ -183,6 +183,29 @@
     }
 
     document.querySelector("form").addEventListener("submit", linkLiffIdBeforeSubmit);
+
+    document.getElementById('albForm').addEventListener('submit', function(e) {
+      // 送信後、サーバーからのリダイレクトやページ遷移を防ぎ、完了メッセージを表示
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => {
+        if (res.ok) {
+          document.getElementById('albForm').style.display = 'none';
+          document.getElementById('successMsg').style.display = 'block';
+        } else {
+          res.text().then(txt => alert('送信エラー: ' + txt));
+        }
+      })
+      .catch(err => {
+        alert('通信エラーが発生しました');
+        console.error(err);
+      });
+    });
   </script>
 </body>
 </html>
